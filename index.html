@@ -1,0 +1,1677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>HEJTERI | Standoff 2 Tournament Series</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --accent-red: #e11d48;
+            --accent-red-dim: #9f1239;
+            --accent-green: #10b981;
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --text-tertiary: #6b7280;
+            --border-default: rgba(255, 255, 255, 0.05);
+            --border-light: rgba(255, 255, 255, 0.08);
+            --gradient-red: linear-gradient(135deg, #e11d48, #9f1239);
+        }
+
+        body {
+            background: #010101;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        .bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-gradient {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at 30% 40%, #0f0f12, #010101);
+        }
+
+        .bg-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.3;
+            animation: float 25s infinite ease-in-out;
+        }
+
+        .orb-1 {
+            width: 600px;
+            height: 600px;
+            background: #e11d48;
+            top: -200px;
+            left: -200px;
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
+            width: 700px;
+            height: 700px;
+            background: #10b981;
+            bottom: -250px;
+            right: -250px;
+            animation-delay: -8s;
+            opacity: 0.2;
+        }
+
+        .orb-3 {
+            width: 500px;
+            height: 500px;
+            background: #e11d48;
+            top: 40%;
+            right: 5%;
+            animation-delay: -15s;
+            opacity: 0.15;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(40px, -40px) scale(1.08); }
+            66% { transform: translate(-30px, 30px) scale(0.96); }
+            100% { transform: translate(0, 0) scale(1); }
+        }
+
+        .bg-noise {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.025'/%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+
+        .content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 32px;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(1, 1, 1, 0.75);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-default);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 18px 32px;
+        }
+
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: var(--gradient-red);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-red);
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .login-btn, .register-btn {
+            background: transparent;
+            border: 1px solid var(--border-light);
+            padding: 8px 20px;
+            border-radius: 30px;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .login-btn:hover, .register-btn:hover {
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        .logout-btn {
+            background: rgba(225, 29, 72, 0.15);
+            border: 1px solid var(--accent-red);
+            padding: 8px 20px;
+            border-radius: 30px;
+            color: var(--accent-red);
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .user-email {
+            font-size: 0.7rem;
+            color: var(--accent-green);
+            margin-right: 12px;
+        }
+
+        .admin-btn {
+            background: transparent;
+            border: 1px solid var(--border-light);
+            padding: 8px 20px;
+            border-radius: 30px;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .admin-btn:hover {
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: rgba(15, 15, 18, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-default);
+            border-radius: 24px;
+            padding: 40px;
+            width: 90%;
+            max-width: 420px;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 24px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-tertiary);
+        }
+
+        .modal-close:hover {
+            color: var(--accent-red);
+        }
+
+        .modal h2 {
+            font-family: 'Syne', sans-serif;
+            margin-bottom: 24px;
+            font-size: 1.5rem;
+        }
+
+        .modal input, .modal textarea {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-default);
+            border-radius: 12px;
+            padding: 14px 16px;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            font-size: 0.9rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .modal input:focus, .modal textarea:focus {
+            outline: none;
+            border-color: var(--accent-red);
+        }
+
+        .modal button {
+            width: 100%;
+            background: var(--gradient-red);
+            border: none;
+            border-radius: 40px;
+            padding: 14px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        .modal-switch {
+            text-align: center;
+            margin-top: 20px;
+            color: var(--text-tertiary);
+            font-size: 0.8rem;
+        }
+
+        .modal-switch span {
+            color: var(--accent-green);
+            cursor: pointer;
+        }
+
+        .error-msg {
+            color: var(--accent-red);
+            font-size: 0.75rem;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .success-msg {
+            color: var(--accent-green);
+            font-size: 0.75rem;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .hero {
+            min-height: 95vh;
+            display: flex;
+            align-items: center;
+            padding: 140px 0 80px;
+        }
+
+        .hero-badge {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            color: var(--accent-green);
+            margin-bottom: 24px;
+        }
+
+        .hero-title {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(3rem, 8vw, 5.5rem);
+            font-weight: 800;
+            line-height: 1.05;
+            margin-bottom: 24px;
+            letter-spacing: -0.03em;
+        }
+
+        .hero-title .red {
+            color: var(--accent-red);
+        }
+
+        .hero-desc {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            max-width: 520px;
+            margin-bottom: 36px;
+            line-height: 1.6;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 48px;
+            margin-bottom: 44px;
+        }
+
+        .stat-number {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--accent-red);
+            font-family: 'Syne', sans-serif;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--gradient-red);
+            border: none;
+            padding: 16px 40px;
+            border-radius: 40px;
+            color: white;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 25px rgba(225, 29, 72, 0.35);
+            gap: 16px;
+        }
+
+        .countdown-section {
+            margin-top: 70px;
+            padding-top: 40px;
+            border-top: 1px solid var(--border-default);
+        }
+
+        .countdown-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--text-tertiary);
+            margin-bottom: 16px;
+        }
+
+        .countdown {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .countdown-item {
+            background: rgba(10, 10, 12, 0.5);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--border-default);
+            border-radius: 14px;
+            padding: 16px 24px;
+            min-width: 90px;
+            text-align: center;
+        }
+
+        .countdown-number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--accent-green);
+            font-family: 'Syne', sans-serif;
+        }
+
+        .countdown-unit {
+            font-size: 0.65rem;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+        }
+
+        .section {
+            padding: 80px 0;
+        }
+
+        .section-header {
+            margin-bottom: 48px;
+        }
+
+        .section-tag {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            color: var(--accent-green);
+            margin-bottom: 12px;
+        }
+
+        .section-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .about-text {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        .about-text p {
+            margin-bottom: 20px;
+        }
+
+        .about-card {
+            background: rgba(10, 10, 12, 0.4);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-default);
+            border-radius: 24px;
+            padding: 48px 32px;
+            text-align: center;
+        }
+
+        .about-card .big-letter {
+            font-size: 4rem;
+            font-weight: 800;
+            color: var(--accent-red);
+            font-family: 'Syne', sans-serif;
+            margin-bottom: 16px;
+        }
+
+        .tournaments-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 28px;
+        }
+
+        .tournament-card {
+            background: rgba(10, 10, 12, 0.5);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--border-default);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.25s ease;
+        }
+
+        .tournament-card:hover {
+            border-color: var(--accent-red);
+            transform: translateY(-4px);
+        }
+
+        .tournament-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-default);
+            background: rgba(20, 20, 24, 0.3);
+        }
+
+        .tournament-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .tournament-date {
+            font-size: 0.7rem;
+            color: var(--text-tertiary);
+        }
+
+        .tournament-body {
+            padding: 20px 24px;
+        }
+
+        .tournament-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .info-chip {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .tournament-prize {
+            background: rgba(16, 185, 129, 0.06);
+            padding: 12px;
+            border-radius: 10px;
+            margin: 12px 0;
+            font-size: 0.75rem;
+            color: var(--accent-green);
+        }
+
+        .tournament-status {
+            font-size: 0.7rem;
+            color: var(--accent-green);
+        }
+
+        .tournament-actions {
+            margin-top: 16px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .edit-btn, .delete-btn, .register-team-btn, .view-teams-btn {
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+        }
+
+        .edit-btn {
+            background: rgba(16, 185, 129, 0.12);
+            color: var(--accent-green);
+        }
+
+        .delete-btn {
+            background: rgba(225, 29, 72, 0.12);
+            color: var(--accent-red);
+        }
+
+        .register-team-btn {
+            background: rgba(225, 29, 72, 0.12);
+            color: var(--accent-red);
+        }
+
+        .view-teams-btn {
+            background: rgba(59, 130, 246, 0.12);
+            color: #3b82f6;
+        }
+
+        .admin-panel {
+            background: rgba(10, 10, 12, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-default);
+            border-radius: 24px;
+            padding: 32px;
+            margin-bottom: 48px;
+            display: none;
+        }
+
+        .admin-panel.active {
+            display: block;
+        }
+
+        .admin-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: var(--accent-red);
+        }
+
+        .admin-form {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .admin-form .full-width {
+            grid-column: span 2;
+        }
+
+        .admin-form input, .admin-form textarea {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-default);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .admin-form input:focus, .admin-form textarea:focus {
+            outline: none;
+            border-color: var(--accent-red);
+        }
+
+        .admin-form button {
+            background: var(--gradient-red);
+            border: none;
+            border-radius: 40px;
+            padding: 12px 24px;
+            color: white;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        .rules-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+
+        .rule-card {
+            background: rgba(10, 10, 12, 0.4);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--border-default);
+            border-radius: 18px;
+            padding: 24px 20px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .rule-card:hover {
+            border-color: var(--accent-green);
+        }
+
+        .rule-card i {
+            font-size: 1.6rem;
+            color: var(--accent-green);
+            margin-bottom: 14px;
+        }
+
+        .rule-card h3 {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .rule-card p {
+            font-size: 0.7rem;
+            color: var(--text-tertiary);
+        }
+
+        .social-section {
+            border-top: 1px solid var(--border-default);
+            border-bottom: 1px solid var(--border-default);
+            padding: 60px 0;
+            text-align: center;
+        }
+
+        .social-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 32px;
+            flex-wrap: wrap;
+        }
+
+        .social-btn {
+            background: transparent;
+            border: 1px solid var(--border-light);
+            padding: 12px 28px;
+            border-radius: 40px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .social-btn:hover {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        .footer {
+            padding: 40px 0;
+            text-align: center;
+            color: var(--text-tertiary);
+            font-size: 0.7rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px;
+            background: rgba(10, 10, 12, 0.4);
+            backdrop-filter: blur(8px);
+            border-radius: 20px;
+            color: var(--text-tertiary);
+        }
+
+        .teams-list-modal {
+            max-width: 700px !important;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .team-item {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .team-name {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--accent-red);
+            margin-bottom: 8px;
+        }
+
+        .player-row {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            padding: 4px 0;
+            border-bottom: 1px solid var(--border-default);
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 0 20px; }
+            .nav-container { flex-direction: column; gap: 12px; padding: 14px 20px; }
+            .nav-links { gap: 28px; }
+            .hero-stats { gap: 28px; }
+            .about-grid { grid-template-columns: 1fr; gap: 40px; }
+            .rules-grid { grid-template-columns: repeat(2, 1fr); }
+            .admin-form { grid-template-columns: 1fr; }
+            .admin-form .full-width { grid-column: span 1; }
+            .tournaments-grid { grid-template-columns: 1fr; }
+            .auth-buttons { flex-direction: column; gap: 8px; }
+        }
+
+        @media (max-width: 480px) {
+            .rules-grid { grid-template-columns: 1fr; }
+            .countdown-item { padding: 10px 14px; min-width: 65px; }
+            .countdown-number { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg">
+    <div class="bg-gradient"></div>
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+    <div class="bg-orb orb-3"></div>
+    <div class="bg-noise"></div>
+</div>
+
+<div class="content">
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">HEJTERI</div>
+            <div class="nav-links">
+                <a href="#home">Home</a>
+                <a href="#about">About</a>
+                <a href="#tournaments">Tournaments</a>
+                <a href="#rules">Rules</a>
+            </div>
+            <div class="auth-buttons" id="unauthButtons">
+                <button class="login-btn" id="showLoginBtn">Login</button>
+                <button class="register-btn" id="showRegisterBtn">Register</button>
+            </div>
+            <div class="auth-buttons" id="authButtons" style="display: none;">
+                <span class="user-email" id="userEmail"></span>
+                <button class="logout-btn" id="logoutBtn">Logout</button>
+                <button class="admin-btn" id="adminToggleBtn">Admin</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- LOGIN MODAL -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('loginModal')">&times;</span>
+            <h2>Login</h2>
+            <div id="loginError" class="error-msg"></div>
+            <input type="email" id="loginEmail" placeholder="Email">
+            <input type="password" id="loginPassword" placeholder="Password">
+            <button onclick="login()">Login</button>
+            <div class="modal-switch">
+                Don't have an account? <span onclick="switchToRegister()">Register</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- REGISTER MODAL -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('registerModal')">&times;</span>
+            <h2>Register</h2>
+            <div id="registerError" class="error-msg"></div>
+            <div id="registerSuccess" class="success-msg"></div>
+            <input type="text" id="registerUsername" placeholder="Username">
+            <input type="email" id="registerEmail" placeholder="Email">
+            <input type="password" id="registerPassword" placeholder="Password (min. 6 characters)">
+            <button onclick="register()">Register</button>
+            <div class="modal-switch">
+                Already have an account? <span onclick="switchToLogin()">Login</span>
+            </div>
+        </div>
+    </div>
+
+    <section id="home" class="hero">
+        <div class="container">
+            <div class="hero-badge">STANDOFF 2 • BALKAN CIRCUIT</div>
+            <h1 class="hero-title">
+                <span class="red">HEJTERI</span><br>
+                Tournament Series
+            </h1>
+            <p class="hero-desc">
+                Professional Standoff 2 tournaments with strict anti-cheat, experienced admins, and competitive prize pools.
+            </p>
+            <div class="hero-stats">
+                <div><div class="stat-number">500+</div><div class="stat-label">Teams</div></div>
+                <div><div class="stat-number">€10K+</div><div class="stat-label">Prize Pool</div></div>
+                <div><div class="stat-number">24/7</div><div class="stat-label">Support</div></div>
+            </div>
+            <button class="btn-primary" id="contactBtn">
+                Register Now
+                <i class="fas fa-arrow-right"></i>
+            </button>
+
+            <div class="countdown-section">
+                <div class="countdown-label">Next tournament starts in</div>
+                <div class="countdown">
+                    <div class="countdown-item"><div class="countdown-number" id="days">--</div><div class="countdown-unit">Days</div></div>
+                    <div class="countdown-item"><div class="countdown-number" id="hours">--</div><div class="countdown-unit">Hours</div></div>
+                    <div class="countdown-item"><div class="countdown-number" id="minutes">--</div><div class="countdown-unit">Minutes</div></div>
+                    <div class="countdown-item"><div class="countdown-number" id="seconds">--</div><div class="countdown-unit">Seconds</div></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="section">
+        <div class="container">
+            <div class="about-grid">
+                <div>
+                    <div class="section-tag">ABOUT</div>
+                    <h2 class="section-title" style="margin-bottom: 24px;">Elite tournament organization</h2>
+                    <div class="about-text">
+                        <p>HEJTERI is a professional esports organization dedicated to delivering high-quality Standoff 2 tournaments across the Balkan region.</p>
+                        <p>Founded with a commitment to competitive integrity, we provide a platform where skill is the only factor that matters.</p>
+                        <p>Our events feature strict anti-cheat measures, experienced administration, and transparent prize distribution.</p>
+                    </div>
+                </div>
+                <div class="about-card">
+                    <div class="big-letter">H</div>
+                    <div style="font-weight: 600; margin-bottom: 6px;">Zero tolerance policy</div>
+                    <p style="font-size: 0.75rem; color: var(--text-tertiary);">Cheating = permanent ban for the entire team</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="tournaments" class="section">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-tag">ACTIVE TOURNAMENTS</div>
+                <h2 class="section-title">Secure your spot</h2>
+            </div>
+
+            <div id="adminPanel" class="admin-panel">
+                <div class="admin-title">Tournament Management</div>
+                <form id="tournamentForm" class="admin-form">
+                    <input type="text" id="tournamentName" placeholder="Tournament name" required>
+                    <input type="text" id="tournamentDate" placeholder="Date (e.g., 28 June 2026)" required>
+                    <input type="text" id="tournamentTime" placeholder="Time (e.g., 19:00 CET)" required>
+                    <input type="text" id="tournamentPrize" placeholder="Prize pool" required>
+                    <textarea id="tournamentDetails" class="full-width" rows="2" placeholder="Prize breakdown..."></textarea>
+                    <input type="number" id="tournamentSlots" placeholder="Team slots" value="16">
+                    <button type="submit" class="full-width">Add Tournament</button>
+                </form>
+            </div>
+
+            <div id="tournamentsGrid" class="tournaments-grid"></div>
+        </div>
+    </section>
+
+    <section id="rules" class="section">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-tag">REGULATIONS</div>
+                <h2 class="section-title">Tournament rules</h2>
+            </div>
+            <div class="rules-grid">
+                <div class="rule-card"><i class="fas fa-ban"></i><h3>Anti-Cheat</h3><p>Zero tolerance. Lifetime ban for cheating.</p></div>
+                <div class="rule-card"><i class="fab fa-discord"></i><h3>Discord Required</h3><p>All check-ins via official Discord.</p></div>
+                <div class="rule-card"><i class="fas fa-handshake"></i><h3>Fair Play</h3><p>Respect opponents and admins.</p></div>
+                <div class="rule-card"><i class="fas fa-clock"></i><h3>Punctuality</h3><p>15min grace period, then forfeit.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <div class="social-section">
+        <div class="container">
+            <div class="section-tag">CONNECT</div>
+            <h2 class="section-title" style="margin-bottom: 8px;">Join the community</h2>
+            <div class="social-buttons">
+                <button class="social-btn" id="discordBtn"><i class="fab fa-discord"></i> Discord</button>
+                <button class="social-btn" id="instagramBtn"><i class="fab fa-instagram"></i> Instagram</button>
+                <button class="social-btn" id="emailBtn"><i class="fas fa-envelope"></i> Contact</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>© 2026 HEJTERI — Professional Standoff 2 Tournament Organization</p>
+        </div>
+    </footer>
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+<script>
+    // Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyBkgVgSHnp--SlD2UANQnl_Ez6Cdt1Lbes",
+        authDomain: "hejteri-da76d.firebaseapp.com",
+        projectId: "hejteri-da76d",
+        storageBucket: "hejteri-da76d.firebasestorage.app",
+        messagingSenderId: "32456880842",
+        appId: "1:32456880842:web:d38b7fb7d81ab17c0bfa33",
+        measurementId: "G-7XYCZ0SEQF"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    let tournaments = [];
+    let countdownInterval = null;
+
+    // ============ TOURNAMENT FUNCTIONS ============
+    function loadTournaments() {
+        const saved = localStorage.getItem('hejteri_tournaments');
+        if (saved) {
+            tournaments = JSON.parse(saved);
+            tournaments = tournaments.map(t => {
+                if (!t.registeredTeams) t.registeredTeams = [];
+                return t;
+            });
+            saveTournaments();
+        } else {
+            tournaments = [];
+            saveTournaments();
+        }
+        renderTournaments();
+        updateCountdownFromTournaments();
+    }
+
+    function saveTournaments() {
+        localStorage.setItem('hejteri_tournaments', JSON.stringify(tournaments));
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    function parseDateFromString(dateStr, timeStr) {
+        const months = {
+            'january': 0, 'february': 1, 'march': 2, 'april': 3, 'may': 4, 'june': 5,
+            'july': 6, 'august': 7, 'september': 8, 'october': 9, 'november': 10, 'december': 11,
+            'januar': 0, 'februar': 1, 'mart': 2, 'april': 3, 'maj': 4, 'juni': 5,
+            'juli': 6, 'august': 7, 'septembar': 8, 'oktobar': 9, 'novembar': 10, 'decembar': 11
+        };
+        
+        const parts = dateStr.split(' ');
+        if (parts.length < 3) return null;
+        
+        const day = parseInt(parts[0]);
+        const monthName = parts[1].toLowerCase();
+        const year = parseInt(parts[2]);
+        
+        const month = months[monthName];
+        if (month === undefined) return null;
+        
+        let hour = 19, minute = 0;
+        if (timeStr) {
+            const timeMatch = timeStr.match(/(\d{1,2}):(\d{2})/);
+            if (timeMatch) {
+                hour = parseInt(timeMatch[1]);
+                minute = parseInt(timeMatch[2]);
+            }
+        }
+        
+        return new Date(year, month, day, hour, minute, 0);
+    }
+
+    function getNextTournament() {
+        if (!tournaments || tournaments.length === 0) return null;
+        
+        const now = new Date();
+        let nextTournament = null;
+        let nextDate = null;
+        
+        for (const tournament of tournaments) {
+            const tournamentDate = parseDateFromString(tournament.date, tournament.time);
+            if (tournamentDate && tournamentDate > now) {
+                if (!nextDate || tournamentDate < nextDate) {
+                    nextDate = tournamentDate;
+                    nextTournament = tournament;
+                }
+            }
+        }
+        
+        return nextTournament ? { tournament: nextTournament, date: nextDate } : null;
+    }
+
+    function updateCountdownFromTournaments() {
+        const next = getNextTournament();
+        const daysEl = document.getElementById('days');
+        const hoursEl = document.getElementById('hours');
+        const minutesEl = document.getElementById('minutes');
+        const secondsEl = document.getElementById('seconds');
+        
+        if (!next) {
+            if (daysEl) daysEl.innerText = '--';
+            if (hoursEl) hoursEl.innerText = '--';
+            if (minutesEl) minutesEl.innerText = '--';
+            if (secondsEl) secondsEl.innerText = '--';
+            return;
+        }
+        
+        if (countdownInterval) clearInterval(countdownInterval);
+        
+        function update() {
+            const now = new Date();
+            const diff = next.date - now;
+            
+            if (diff <= 0) {
+                updateCountdownFromTournaments();
+                return;
+            }
+            
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % 86400000) / 3600000);
+            const minutes = Math.floor((diff % 3600000) / 60000);
+            const seconds = Math.floor((diff % 60000) / 1000);
+            
+            if (daysEl) daysEl.innerText = days < 10 ? '0' + days : days;
+            if (hoursEl) hoursEl.innerText = hours < 10 ? '0' + hours : hours;
+            if (minutesEl) minutesEl.innerText = minutes < 10 ? '0' + minutes : minutes;
+            if (secondsEl) secondsEl.innerText = seconds < 10 ? '0' + seconds : seconds;
+        }
+        
+        update();
+        countdownInterval = setInterval(update, 1000);
+    }
+
+    function addTournament(name, date, time, prize, details, slots) {
+        tournaments.push({
+            id: Date.now(),
+            name: name,
+            date: date,
+            time: time,
+            prize: prize,
+            details: details,
+            slots: parseInt(slots),
+            registeredTeams: []
+        });
+        saveTournaments();
+        renderTournaments();
+        updateCountdownFromTournaments();
+    }
+
+    window.deleteTournament = function(id) {
+        if (confirm('Delete this tournament?')) {
+            tournaments = tournaments.filter(t => t.id !== id);
+            saveTournaments();
+            renderTournaments();
+            updateCountdownFromTournaments();
+        }
+    };
+
+    window.editTournament = function(id) {
+        const t = tournaments.find(t => t.id === id);
+        if (!t) return;
+        const newName = prompt('Tournament name:', t.name);
+        if (newName && newName.trim()) t.name = newName;
+        const newDate = prompt('Date:', t.date);
+        if (newDate && newDate.trim()) t.date = newDate;
+        const newTime = prompt('Time:', t.time);
+        if (newTime && newTime.trim()) t.time = newTime;
+        const newPrize = prompt('Prize pool:', t.prize);
+        if (newPrize && newPrize.trim()) t.prize = newPrize;
+        saveTournaments();
+        renderTournaments();
+        updateCountdownFromTournaments();
+    };
+
+    // ============ VIEW REGISTERED TEAMS FOR ADMIN ============
+    window.viewRegisteredTeams = function(tournamentId) {
+        const tournament = tournaments.find(t => t.id === tournamentId);
+        if (!tournament || !tournament.registeredTeams || tournament.registeredTeams.length === 0) {
+            alert('No teams registered for this tournament.');
+            return;
+        }
+
+        const existingModal = document.getElementById('teamsListModal');
+        if (existingModal) existingModal.remove();
+
+        const modal = document.createElement('div');
+        modal.id = 'teamsListModal';
+        modal.className = 'modal active';
+        modal.style.display = 'flex';
+
+        let teamsHtml = '';
+        tournament.registeredTeams.forEach((team, idx) => {
+            let playersHtml = '';
+            playersHtml += `<div class="player-row">👑 Captain: ${escapeHtml(team.captainDiscord)} (SO2: ${escapeHtml(team.captainSo2Id)}) - ${escapeHtml(team.captainEmail)}</div>`;
+            
+            team.players.forEach((player, pIdx) => {
+                playersHtml += `<div class="player-row">👤 Player ${pIdx + 1}: ${escapeHtml(player.discord)} (SO2: ${escapeHtml(player.so2Id)})</div>`;
+            });
+            
+            teamsHtml += `
+                <div class="team-item">
+                    <div class="team-name">🏆 ${escapeHtml(team.teamName)}</div>
+                    ${playersHtml}
+                    <div class="player-row" style="border-bottom: none; margin-top: 8px; color: var(--text-tertiary);">Registered: ${new Date(team.registeredAt).toLocaleString()}</div>
+                </div>
+            `;
+        });
+
+        modal.innerHTML = `
+            <div class="modal-content teams-list-modal">
+                <span class="modal-close" onclick="this.closest('.modal').remove()">&times;</span>
+                <h2 style="font-size: 1.3rem;">Registered Teams - ${escapeHtml(tournament.name)}</h2>
+                <div style="margin-bottom: 16px; color: var(--accent-green);">Total: ${tournament.registeredTeams.length}/${tournament.slots} teams</div>
+                ${teamsHtml}
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+    };
+
+    // ============ TEAM REGISTRATION (CAPTAIN ONLY) ============
+    window.openTeamRegistrationModal = function(tournamentId) {
+        const user = auth.currentUser;
+        if (!user) {
+            alert('You must be logged in to register a team.');
+            openModal('loginModal');
+            return;
+        }
+        
+        const tournament = tournaments.find(t => t.id === tournamentId);
+        if (!tournament) {
+            alert('Tournament does not exist.');
+            return;
+        }
+        
+        const alreadyCaptain = tournament.registeredTeams?.some(team => team.captainId === user.uid);
+        if (alreadyCaptain) {
+            alert('You are already a captain of a team in this tournament. Only one team per tournament.');
+            return;
+        }
+        
+        const isMember = tournament.registeredTeams?.some(team => team.players.some(p => p.userId === user.uid));
+        if (isMember) {
+            alert('You are already a member of a team registered for this tournament.');
+            return;
+        }
+        
+        if (tournament.registeredTeams && tournament.registeredTeams.length >= tournament.slots) {
+            alert('Tournament is already full!');
+            return;
+        }
+        
+        showTeamRegistrationForm(tournamentId, tournament);
+    };
+
+    function showTeamRegistrationForm(tournamentId, tournament) {
+        const existingModal = document.getElementById('teamRegistrationModal');
+        if (existingModal) existingModal.remove();
+        
+        const modal = document.createElement('div');
+        modal.id = 'teamRegistrationModal';
+        modal.className = 'modal active';
+        modal.style.display = 'flex';
+        
+        let playersHtml = '';
+        for (let i = 1; i <= 4; i++) {
+            playersHtml += `
+                <div style="margin-bottom: 20px; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 12px;">
+                    <div style="font-size: 0.8rem; color: var(--accent-green); margin-bottom: 8px;">Player ${i}</div>
+                    <input type="text" id="playerDiscord_${i}" placeholder="Discord username (e.g., player#1234)" style="margin-bottom: 8px;">
+                    <input type="text" id="playerSo2Id_${i}" placeholder="Standoff 2 ID (e.g., 123456789)" style="margin-bottom: 0;">
+                </div>
+            `;
+        }
+        
+        modal.innerHTML = `
+            <div class="modal-content" style="max-width: 500px; max-height: 85vh; overflow-y: auto;">
+                <span class="modal-close" onclick="this.closest('.modal').remove()">&times;</span>
+                <h2 style="font-size: 1.3rem;">Team Registration - ${escapeHtml(tournament.name)}</h2>
+                <div style="margin-bottom: 16px; padding: 8px; background: rgba(225,29,72,0.1); border-radius: 8px; font-size: 0.75rem; color: var(--accent-red);">
+                    ⚠️ Captain is responsible for the validity of all team members' data.
+                </div>
+                
+                <div style="margin-bottom: 20px; padding: 12px; background: rgba(16,185,129,0.1); border-radius: 12px;">
+                    <div style="font-size: 0.85rem; font-weight: 600; margin-bottom: 8px;">👑 CAPTAIN (YOU)</div>
+                    <input type="text" id="captainDiscord" placeholder="Your Discord username" style="margin-bottom: 8px;">
+                    <input type="text" id="captainSo2Id" placeholder="Your Standoff 2 ID" style="margin-bottom: 0;">
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <div style="font-size: 0.85rem; font-weight: 600; margin-bottom: 8px;">👥 TEAM MEMBERS</div>
+                    ${playersHtml}
+                </div>
+                
+                <div style="margin-bottom: 16px;">
+                    <input type="text" id="teamName" placeholder="Team name (e.g., HEJTERI Gaming)" style="margin-bottom: 8px;">
+                </div>
+                
+                <button onclick="submitTeamRegistration(${tournamentId})" style="background: var(--gradient-red); width: 100%; padding: 14px; border: none; border-radius: 40px; color: white; font-weight: 600; cursor: pointer;">
+                    Register Team
+                </button>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+    }
+
+    window.submitTeamRegistration = async function(tournamentId) {
+        const user = auth.currentUser;
+        if (!user) {
+            alert('You are not logged in!');
+            return;
+        }
+        
+        const captainDiscord = document.getElementById('captainDiscord')?.value.trim();
+        const captainSo2Id = document.getElementById('captainSo2Id')?.value.trim();
+        const teamName = document.getElementById('teamName')?.value.trim();
+        
+        if (!captainDiscord || !captainSo2Id) {
+            alert('Please enter your Discord username and Standoff 2 ID.');
+            return;
+        }
+        
+        if (!teamName) {
+            alert('Please enter a team name.');
+            return;
+        }
+        
+        const players = [];
+        for (let i = 1; i <= 4; i++) {
+            const discord = document.getElementById(`playerDiscord_${i}`)?.value.trim();
+            const so2Id = document.getElementById(`playerSo2Id_${i}`)?.value.trim();
+            
+            if (!discord && !so2Id) continue;
+            
+            if (!discord || !so2Id) {
+                alert(`Player ${i}: Please enter both Discord username and Standoff 2 ID, or leave both fields empty.`);
+                return;
+            }
+            
+            players.push({
+                discord: discord,
+                so2Id: so2Id,
+                userId: null
+            });
+        }
+        
+        const allSo2Ids = [captainSo2Id, ...players.map(p => p.so2Id)];
+        const allDiscords = [captainDiscord, ...players.map(p => p.discord)];
+        
+        if (new Set(allSo2Ids).size !== allSo2Ids.length) {
+            alert('Error: Two or more members have the same Standoff 2 ID!');
+            return;
+        }
+        
+        if (new Set(allDiscords.map(d => d.toLowerCase())).size !== allDiscords.length) {
+            alert('Error: Two or more members have the same Discord username!');
+            return;
+        }
+        
+        const tournamentIndex = tournaments.findIndex(t => t.id === tournamentId);
+        if (tournamentIndex === -1) {
+            alert('Tournament does not exist.');
+            return;
+        }
+        
+        const tournament = tournaments[tournamentIndex];
+        
+        if (tournament.registeredTeams && tournament.registeredTeams.length >= tournament.slots) {
+            alert('Tournament is already full!');
+            document.getElementById('teamRegistrationModal')?.remove();
+            renderTournaments();
+            return;
+        }
+        
+        const teamRegistration = {
+            captainId: user.uid,
+            captainEmail: user.email,
+            captainDiscord: captainDiscord,
+            captainSo2Id: captainSo2Id,
+            teamName: teamName,
+            players: players,
+            registeredAt: new Date().toISOString(),
+            status: 'approved'
+        };
+        
+        if (!tournament.registeredTeams) tournament.registeredTeams = [];
+        tournament.registeredTeams.push(teamRegistration);
+        
+        saveTournaments();
+        
+        try {
+            await db.collection('tournamentRegistrations').doc(`${tournamentId}_${user.uid}`).set(teamRegistration);
+        } catch(e) { console.log('Firestore save error:', e); }
+        
+        alert(`Team "${teamName}" has been successfully registered!`);
+        document.getElementById('teamRegistrationModal')?.remove();
+        renderTournaments();
+    };
+
+    // ============ RENDER TOURNAMENTS ============
+    function renderTournaments() {
+        const grid = document.getElementById('tournamentsGrid');
+        if (!grid) return;
+        
+        const adminActive = document.getElementById('adminPanel') ? document.getElementById('adminPanel').classList.contains('active') : false;
+        const isLoggedIn = auth.currentUser !== null;
+        const currentUser = auth.currentUser;
+        
+        if (tournaments.length === 0) {
+            grid.innerHTML = '<div class="empty-state">No active tournaments scheduled. Check back later.</div>';
+            return;
+        }
+        
+        grid.innerHTML = tournaments.map(t => {
+            const registeredCount = t.registeredTeams?.length || 0;
+            const isFull = registeredCount >= t.slots;
+            const userAlreadyCaptain = currentUser && t.registeredTeams?.some(team => team.captainId === currentUser.uid);
+            const userIsMember = currentUser && t.registeredTeams?.some(team => team.players.some(p => p.userId === currentUser.uid));
+            
+            return `
+                <div class="tournament-card">
+                    <div class="tournament-header">
+                        <div class="tournament-name">${escapeHtml(t.name)}</div>
+                        <div class="tournament-date">${escapeHtml(t.date)} • ${escapeHtml(t.time)}</div>
+                    </div>
+                    <div class="tournament-body">
+                        <div class="tournament-info">
+                            <span class="info-chip">🏆 Prize: ${escapeHtml(t.prize)}</span>
+                            <span class="info-chip">👥 Registered: ${registeredCount}/${t.slots}</span>
+                        </div>
+                        ${t.details ? `<div class="tournament-prize">${escapeHtml(t.details)}</div>` : ''}
+                        <div class="tournament-status">${isFull ? '🔴 Full' : '🟢 Registration Open'}</div>
+                        
+                        <div class="tournament-actions">
+                            ${adminActive ? `
+                                <button class="edit-btn" onclick="editTournament(${t.id})">✏️ Edit</button>
+                                <button class="delete-btn" onclick="deleteTournament(${t.id})">🗑️ Delete</button>
+                                <button class="view-teams-btn" onclick="viewRegisteredTeams(${t.id})">📋 Teams (${registeredCount})</button>
+                            ` : ''}
+                            
+                            ${!adminActive && isLoggedIn && !isFull && !userAlreadyCaptain && !userIsMember ? `
+                                <button class="register-team-btn" onclick="openTeamRegistrationModal(${t.id})">➕ Register Team</button>
+                            ` : ''}
+                            
+                            ${!adminActive && userAlreadyCaptain ? `
+                                <span style="font-size: 0.7rem; color: var(--accent-green);">✅ Your team is registered</span>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // ============ MODAL FUNCTIONS ============
+    window.openModal = function(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) modal.classList.add('active');
+    };
+
+    window.closeModal = function(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) modal.classList.remove('active');
+        const loginError = document.getElementById('loginError');
+        const registerError = document.getElementById('registerError');
+        const registerSuccess = document.getElementById('registerSuccess');
+        if (loginError) loginError.innerText = '';
+        if (registerError) registerError.innerText = '';
+        if (registerSuccess) registerSuccess.innerText = '';
+    };
+
+    window.switchToRegister = function() {
+        closeModal('loginModal');
+        openModal('registerModal');
+    };
+
+    window.switchToLogin = function() {
+        closeModal('registerModal');
+        openModal('loginModal');
+    };
+
+    // ============ AUTH FUNCTIONS ============
+    window.login = function() {
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        const errorDiv = document.getElementById('loginError');
+        
+        if (errorDiv) errorDiv.innerText = '';
+        
+        if (!email || !password) {
+            if (errorDiv) errorDiv.innerText = 'Enter email and password';
+            return;
+        }
+        
+        auth.signInWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+                closeModal('loginModal');
+                document.getElementById('loginEmail').value = '';
+                document.getElementById('loginPassword').value = '';
+            })
+            .catch((error) => {
+                if (errorDiv) {
+                    if (error.code === 'auth/user-not-found') {
+                        errorDiv.innerText = 'User not found';
+                    } else if (error.code === 'auth/wrong-password') {
+                        errorDiv.innerText = 'Wrong password';
+                    } else if (error.code === 'auth/invalid-email') {
+                        errorDiv.innerText = 'Invalid email';
+                    } else {
+                        errorDiv.innerText = 'Error: ' + error.message;
+                    }
+                }
+            });
+    };
+
+    window.register = function() {
+        const username = document.getElementById('registerUsername').value;
+        const email = document.getElementById('registerEmail').value;
+        const password = document.getElementById('registerPassword').value;
+        const errorDiv = document.getElementById('registerError');
+        const successDiv = document.getElementById('registerSuccess');
+        
+        if (errorDiv) errorDiv.innerText = '';
+        if (successDiv) successDiv.innerText = '';
+        
+        if (!username || !email || !password) {
+            if (errorDiv) errorDiv.innerText = 'Fill all fields';
+            return;
+        }
+        
+        if (password.length < 6) {
+            if (errorDiv) errorDiv.innerText = 'Password must be at least 6 characters';
+            return;
+        }
+        
+        auth.createUserWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+                const user = userCredential.user;
+                return db.collection("users").doc(user.uid).set({
+                    username: username,
+                    email: email,
+                    createdAt: new Date()
+                });
+            })
+            .then(() => {
+                if (successDiv) successDiv.innerText = 'Registration successful!';
+                setTimeout(() => {
+                    closeModal('registerModal');
+                    document.getElementById('registerUsername').value = '';
+                    document.getElementById('registerEmail').value = '';
+                    document.getElementById('registerPassword').value = '';
+                    if (successDiv) successDiv.innerText = '';
+                }, 1500);
+            })
+            .catch((error) => {
+                if (errorDiv) {
+                    if (error.code === 'auth/email-already-in-use') {
+                        errorDiv.innerText = 'Email already exists';
+                    } else if (error.code === 'auth/invalid-email') {
+                        errorDiv.innerText = 'Invalid email';
+                    } else {
+                        errorDiv.innerText = 'Error: ' + error.message;
+                    }
+                }
+            });
+    };
+
+    window.logout = function() {
+        auth.signOut();
+        renderTournaments();
+    };
+
+    // ============ AUTH STATE LISTENER ============
+    auth.onAuthStateChanged((user) => {
+        const unauthDiv = document.getElementById('unauthButtons');
+        const authDiv = document.getElementById('authButtons');
+        const adminPanel = document.getElementById('adminPanel');
+        const adminToggleBtn = document.getElementById('adminToggleBtn');
+        
+        if (user) {
+            if (unauthDiv) unauthDiv.style.display = 'none';
+            if (authDiv) authDiv.style.display = 'flex';
+            const userEmailSpan = document.getElementById('userEmail');
+            if (userEmailSpan) userEmailSpan.innerText = user.email;
+            
+            db.collection("users").doc(user.uid).get().then((doc) => {
+                if (doc.exists && doc.data().username) {
+                    if (userEmailSpan) userEmailSpan.innerText = doc.data().username;
+                }
+            }).catch(err => console.log("Error:", err));
+            
+            // Admin emails - ADD YOUR EMAIL HERE
+            const adminEmails = ['hejterigg@gmail.com', 'admin@hejteri.com'];
+            if (adminToggleBtn) {
+                if (adminEmails.includes(user.email)) {
+                    adminToggleBtn.style.display = 'block';
+                } else {
+                    adminToggleBtn.style.display = 'none';
+                    if (adminPanel) adminPanel.classList.remove('active');
+                }
+            }
+        } else {
+            if (unauthDiv) unauthDiv.style.display = 'flex';
+            if (authDiv) authDiv.style.display = 'none';
+            if (adminPanel) adminPanel.classList.remove('active');
+        }
+        renderTournaments();
+    });
+
+    // ============ EVENT LISTENERS ============
+    document.addEventListener('DOMContentLoaded', function() {
+        const showLoginBtn = document.getElementById('showLoginBtn');
+        const showRegisterBtn = document.getElementById('showRegisterBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const adminToggleBtn = document.getElementById('adminToggleBtn');
+        const tournamentForm = document.getElementById('tournamentForm');
+        const contactBtn = document.getElementById('contactBtn');
+        const discordBtn = document.getElementById('discordBtn');
+        const instagramBtn = document.getElementById('instagramBtn');
+        const emailBtn = document.getElementById('emailBtn');
+        
+        if (showLoginBtn) showLoginBtn.addEventListener('click', () => openModal('loginModal'));
+        if (showRegisterBtn) showRegisterBtn.addEventListener('click', () => openModal('registerModal'));
+        if (logoutBtn) logoutBtn.addEventListener('click', () => auth.signOut());
+        
+        if (adminToggleBtn) {
+            adminToggleBtn.addEventListener('click', () => {
+                const panel = document.getElementById('adminPanel');
+                if (panel) panel.classList.toggle('active');
+                renderTournaments();
+            });
+        }
+        
+        if (tournamentForm) {
+            tournamentForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const name = document.getElementById('tournamentName').value;
+                const date = document.getElementById('tournamentDate').value;
+                const time = document.getElementById('tournamentTime').value;
+                const prize = document.getElementById('tournamentPrize').value;
+                const details = document.getElementById('tournamentDetails').value;
+                const slots = document.getElementById('tournamentSlots').value;
+                if (name && date && time && prize) {
+                    addTournament(name, date, time, prize, details, slots);
+                    tournamentForm.reset();
+                    alert('Tournament added.');
+                } else {
+                    alert('Please fill required fields.');
+                }
+            });
+        }
+        
+        if (contactBtn) {
+            contactBtn.addEventListener('click', () => {
+                alert('To register a team, click "Register Team" on any tournament.');
+            });
+        }
+        
+        if (discordBtn) {
+            discordBtn.addEventListener('click', () => window.open('https://discord.gg/hejteri', '_blank'));
+        }
+        
+        if (instagramBtn) {
+            instagramBtn.addEventListener('click', () => window.open('https://instagram.com/hejteri_esports', '_blank'));
+        }
+        
+        if (emailBtn) {
+            emailBtn.addEventListener('click', () => {
+                navigator.clipboard.writeText('hejteri@balkan.com');
+                alert('Email copied: hejteri@balkan.com');
+            });
+        }
+        
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const target = document.querySelector(link.getAttribute('href'));
+                if (target) target.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+    });
+
+    loadTournaments();
+</script>
+</body>
+</html>
