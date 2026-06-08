@@ -1406,7 +1406,6 @@
             <h2 class="section-title" style="margin-bottom: 8px;">Join the community</h2>
             <div class="social-buttons">
                 <button class="social-btn" id="discordBtn"><i class="fab fa-discord"></i> DISCORD</button>
-                <button class="social-btn" id="instagramBtn"><i class="fab fa-instagram"></i> INSTAGRAM</button>
                 <button class="social-btn" id="emailBtn"><i class="fas fa-envelope"></i> CONTACT</button>
             </div>
         </div>
@@ -1517,7 +1516,7 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // ==================== DISCORD LOGIN FUNKCIJA (ISPRAVLJENA - PRAVO IME) ====================
+    // ==================== DISCORD LOGIN FUNKCIJA ====================
     const discordProvider = new firebase.auth.OAuthProvider('oidc.discord-login');
     discordProvider.addScope('identify');
     discordProvider.addScope('email');
@@ -1529,7 +1528,6 @@
             
             let discordUsername = 'Discord User';
             
-            // METODA 1: Pokušaj dobiti username iz providerData
             if (user.providerData && user.providerData.length > 0) {
                 const discordData = user.providerData.find(p => p.providerId === 'oidc.discord-login');
                 if (discordData && discordData.displayName && discordData.displayName !== 'Discord User') {
@@ -1537,12 +1535,10 @@
                 }
             }
             
-            // METODA 2: Ako nema, uzmi iz email-a (bez @domena)
             if ((discordUsername === 'Discord User' || !discordUsername) && user.email) {
                 discordUsername = user.email.split('@')[0];
             }
             
-            // METODA 3: Pokušaj dohvatiti preko accessToken-a direktno sa Discord API
             try {
                 const credential = firebase.auth.OAuthProvider.credentialFromResult(result);
                 if (credential && credential.accessToken) {
@@ -1554,7 +1550,6 @@
                         if (discordData.username) {
                             discordUsername = discordData.username;
                         }
-                        // Ako ima i global name (novi Discord sistem)
                         if (discordData.global_name && discordData.global_name !== discordUsername) {
                             discordUsername = discordData.global_name;
                         }
@@ -1564,17 +1559,14 @@
                 console.log('Could not fetch from Discord API:', e);
             }
             
-            // METODA 4: Ako je i dalje 'Discord User', uzmi iz displayName
             if (discordUsername === 'Discord User' && user.displayName && user.displayName !== 'Discord User') {
                 discordUsername = user.displayName;
             }
             
-            // METODA 5: Zadnja opcija - generiši iz UID
             if (discordUsername === 'Discord User' && user.uid) {
                 discordUsername = 'player_' + user.uid.slice(-6);
             }
             
-            // Sačuvaj u Firestore
             await db.collection('users').doc(user.uid).set({
                 uid: user.uid,
                 email: user.email,
@@ -1584,7 +1576,6 @@
                 lastLoginMethod: 'discord'
             }, { merge: true });
             
-            // Ažuriraj display name u Firebase Auth
             if (discordUsername && discordUsername !== 'Discord User') {
                 try {
                     await user.updateProfile({ displayName: discordUsername });
@@ -1597,11 +1588,9 @@
             closeModal('loginModal');
             closeModal('registerModal');
             
-            // Osveži UI
             const userSpan = document.getElementById('userEmail');
             if (userSpan) userSpan.innerText = discordUsername;
             
-            // Ponovo učitaj tournamente da osvježi admin status ako je potrebno
             await loadTournaments();
             
         } catch (error) {
@@ -2798,9 +2787,16 @@
             } else showToast('Fill required fields', true);
         });
         document.getElementById('contactBtn')?.addEventListener('click', () => showToast('Click Register Team on any tournament'));
-        document.getElementById('discordBtn')?.addEventListener('click', () => window.open('https://discord.gg/hejteri', '_blank'));
-        document.getElementById('instagramBtn')?.addEventListener('click', () => window.open('https://instagram.com/hejteri_esports', '_blank'));
-        document.getElementById('emailBtn')?.addEventListener('click', () => { navigator.clipboard.writeText('hejteri@balkan.com'); showToast('Email copied!'); });
+        
+        // Discord link - https://discord.gg/epVVPdpgm
+        document.getElementById('discordBtn')?.addEventListener('click', () => window.open('https://discord.gg/epVVPdpgm', '_blank'));
+        
+        // Email kontakt - hejterigg@gmail.com
+        document.getElementById('emailBtn')?.addEventListener('click', () => { 
+            window.location.href = 'mailto:hejterigg@gmail.com';
+            showToast('Email client opened!'); 
+        });
+        
         document.getElementById('hamburgerBtn')?.addEventListener('click', () => document.getElementById('navLinks')?.classList.toggle('active'));
         
         document.addEventListener('click', function(e) {
