@@ -31,12 +31,6 @@
             --text-muted: #6b7280;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
             background: var(--standoff-bg);
             color: var(--text-primary);
@@ -1523,7 +1517,7 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // ==================== DISCORD LOGIN FUNKCIJA (ISPRAVLJENA) ====================
+    // ==================== DISCORD LOGIN FUNKCIJA (ISPRAVLJENA - PRAVO IME) ====================
     const discordProvider = new firebase.auth.OAuthProvider('oidc.discord-login');
     discordProvider.addScope('identify');
     discordProvider.addScope('email');
@@ -1533,39 +1527,82 @@
             const result = await auth.signInWithPopup(discordProvider);
             const user = result.user;
             
-            let discordUsername = user.displayName || user.email?.split('@')[0] || 'Discord User';
-            let discordAvatar = user.photoURL || null;
-            let discordId = user.uid;
+            let discordUsername = 'Discord User';
             
-            // Pokušaj dohvatiti dodatne podatke iz ID tokena
+            // METODA 1: Pokušaj dobiti username iz providerData
+            if (user.providerData && user.providerData.length > 0) {
+                const discordData = user.providerData.find(p => p.providerId === 'oidc.discord-login');
+                if (discordData && discordData.displayName && discordData.displayName !== 'Discord User') {
+                    discordUsername = discordData.displayName;
+                }
+            }
+            
+            // METODA 2: Ako nema, uzmi iz email-a (bez @domena)
+            if ((discordUsername === 'Discord User' || !discordUsername) && user.email) {
+                discordUsername = user.email.split('@')[0];
+            }
+            
+            // METODA 3: Pokušaj dohvatiti preko accessToken-a direktno sa Discord API
             try {
-                const idTokenResult = await user.getIdTokenResult();
-                if (idTokenResult.claims && idTokenResult.claims.firebase && idTokenResult.claims.firebase.identities) {
-                    const identities = idTokenResult.claims.firebase.identities;
-                    if (identities['oidc.discord-login'] && identities['oidc.discord-login'][0]) {
-                        discordId = identities['oidc.discord-login'][0];
+                const credential = firebase.auth.OAuthProvider.credentialFromResult(result);
+                if (credential && credential.accessToken) {
+                    const response = await fetch('https://discord.com/api/users/@me', {
+                        headers: { 'Authorization': `Bearer ${credential.accessToken}` }
+                    });
+                    if (response.ok) {
+                        const discordData = await response.json();
+                        if (discordData.username) {
+                            discordUsername = discordData.username;
+                        }
+                        // Ako ima i global name (novi Discord sistem)
+                        if (discordData.global_name && discordData.global_name !== discordUsername) {
+                            discordUsername = discordData.global_name;
+                        }
                     }
                 }
             } catch (e) {
-                console.log('Could not fetch additional claims:', e);
+                console.log('Could not fetch from Discord API:', e);
+            }
+            
+            // METODA 4: Ako je i dalje 'Discord User', uzmi iz displayName
+            if (discordUsername === 'Discord User' && user.displayName && user.displayName !== 'Discord User') {
+                discordUsername = user.displayName;
+            }
+            
+            // METODA 5: Zadnja opcija - generiši iz UID
+            if (discordUsername === 'Discord User' && user.uid) {
+                discordUsername = 'player_' + user.uid.slice(-6);
             }
             
             // Sačuvaj u Firestore
             await db.collection('users').doc(user.uid).set({
                 uid: user.uid,
                 email: user.email,
-                discordId: discordId,
                 discordUsername: discordUsername,
-                discordAvatar: discordAvatar,
+                discordId: user.uid,
                 lastLogin: new Date().toISOString(),
                 lastLoginMethod: 'discord'
             }, { merge: true });
+            
+            // Ažuriraj display name u Firebase Auth
+            if (discordUsername && discordUsername !== 'Discord User') {
+                try {
+                    await user.updateProfile({ displayName: discordUsername });
+                } catch(e) { console.log('Could not update profile:', e); }
+            }
             
             showToast(`Welcome ${discordUsername}!`);
             addNotification('Discord Login', `Logged in as ${discordUsername}`, 'info');
             
             closeModal('loginModal');
             closeModal('registerModal');
+            
+            // Osveži UI
+            const userSpan = document.getElementById('userEmail');
+            if (userSpan) userSpan.innerText = discordUsername;
+            
+            // Ponovo učitaj tournamente da osvježi admin status ako je potrebno
+            await loadTournaments();
             
         } catch (error) {
             console.error('Discord login error:', error);
@@ -2683,7 +2720,7 @@
             const userDoc = await db.collection('users').doc(user.uid).get();
             if(userDoc.exists) {
                 const userData = userDoc.data();
-                if(userData.discordUsername) {
+                if(userData.discordUsername && userData.discordUsername !== 'Discord User') {
                     if(userSpan) userSpan.innerText = userData.discordUsername;
                 } else if(userData.username) {
                     if(userSpan) userSpan.innerText = userData.username;
