@@ -16,96 +16,67 @@
         }
 
         :root {
+            --standoff-bg: #0a0a0c;
+            --standoff-card: #0f0f12;
+            --standoff-border: #1a1a1f;
+            --neon-yellow: #FFD700;
+            --neon-yellow-glow: rgba(255, 215, 0, 0.3);
             --accent-red: #e11d48;
-            --accent-red-dim: #9f1239;
             --accent-green: #10b981;
             --text-primary: #ffffff;
             --text-secondary: #a1a1aa;
-            --text-tertiary: #6b7280;
-            --border-default: rgba(255, 255, 255, 0.05);
-            --border-light: rgba(255, 255, 255, 0.08);
-            --gradient-red: linear-gradient(135deg, #e11d48, #9f1239);
+            --text-muted: #6b7280;
+            --gradient-yellow: linear-gradient(135deg, #FFD700, #FFA500);
         }
 
         body {
-            background: #010101;
+            background: var(--standoff-bg);
             color: var(--text-primary);
             font-family: 'Inter', sans-serif;
             line-height: 1.5;
             overflow-x: hidden;
+            position: relative;
         }
 
-        .bg {
+        /* Canvas Background */
+        #canvas-bg {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             z-index: 0;
-            overflow: hidden;
+            display: block;
         }
 
-        .bg-gradient {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(ellipse at 30% 40%, #0f0f12, #010101);
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--standoff-card);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--neon-yellow);
+            border-radius: 10px;
         }
 
-        .bg-orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(100px);
-            opacity: 0.3;
-            animation: float 25s infinite ease-in-out;
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
-
-        .orb-1 {
-            width: 600px;
-            height: 600px;
-            background: #e11d48;
-            top: -200px;
-            left: -200px;
-            animation-delay: 0s;
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-
-        .orb-2 {
-            width: 700px;
-            height: 700px;
-            background: #10b981;
-            bottom: -250px;
-            right: -250px;
-            animation-delay: -8s;
-            opacity: 0.2;
+        @keyframes glowPulse {
+            0%, 100% { box-shadow: 0 0 5px var(--neon-yellow); }
+            50% { box-shadow: 0 0 20px var(--neon-yellow); }
         }
-
-        .orb-3 {
-            width: 500px;
-            height: 500px;
-            background: #e11d48;
-            top: 40%;
-            right: 5%;
-            animation-delay: -15s;
-            opacity: 0.15;
-        }
-
-        @keyframes float {
-            0% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(40px, -40px) scale(1.08); }
-            66% { transform: translate(-30px, 30px) scale(0.96); }
-            100% { transform: translate(0, 0) scale(1); }
-        }
-
-        .bg-noise {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.025'/%3E%3C/svg%3E");
-            pointer-events: none;
+        @keyframes borderGlow {
+            0%, 100% { border-color: rgba(255, 215, 0, 0.3); }
+            50% { border-color: rgba(255, 215, 0, 0.8); }
         }
 
         .content {
@@ -119,109 +90,116 @@
             padding: 0 32px;
         }
 
+        /* Navbar */
         .navbar {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             z-index: 1000;
-            background: rgba(1, 1, 1, 0.75);
+            background: rgba(10, 10, 12, 0.95);
             backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border-default);
+            border-bottom: 1px solid var(--neon-yellow);
         }
-
         .nav-container {
             display: flex;
             justify-content: space-between;
             align-items: center;
             max-width: 1280px;
             margin: 0 auto;
-            padding: 18px 32px;
+            padding: 16px 32px;
         }
-
         .logo {
             font-family: 'Syne', sans-serif;
-            font-size: 1.6rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            background: var(--gradient-red);
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
+            letter-spacing: -0.02em;
         }
-
         .nav-links {
             display: flex;
-            gap: 40px;
+            gap: 48px;
         }
-
         .nav-links a {
             color: var(--text-secondary);
             text-decoration: none;
             font-size: 0.85rem;
             font-weight: 500;
-            transition: color 0.2s;
+            transition: all 0.2s;
         }
-
         .nav-links a:hover {
-            color: var(--accent-red);
+            color: var(--neon-yellow);
         }
-
+        .hamburger {
+            display: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
         .auth-buttons {
             display: flex;
             gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
         }
-
-        .login-btn, .register-btn {
-            background: transparent;
-            border: 1px solid var(--border-light);
+        .login-btn, .register-btn, .logout-btn, .admin-btn {
             padding: 8px 20px;
-            border-radius: 30px;
-            color: var(--text-secondary);
+            border-radius: 8px;
             font-size: 0.75rem;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
+            border: 1px solid;
         }
-
-        .login-btn:hover, .register-btn:hover {
+        .login-btn {
+            background: transparent;
+            border-color: var(--neon-yellow);
+            color: var(--neon-yellow);
+        }
+        .login-btn:hover {
+            background: var(--neon-yellow);
+            color: var(--standoff-bg);
+            transform: translateY(-2px);
+        }
+        .register-btn {
+            background: var(--neon-yellow);
+            border: none;
+            color: var(--standoff-bg);
+        }
+        .register-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px var(--neon-yellow-glow);
+        }
+        .logout-btn {
+            background: rgba(225, 29, 72, 0.1);
             border-color: var(--accent-red);
             color: var(--accent-red);
         }
-
-        .logout-btn {
-            background: rgba(225, 29, 72, 0.15);
-            border: 1px solid var(--accent-red);
-            padding: 8px 20px;
-            border-radius: 30px;
-            color: var(--accent-red);
-            font-size: 0.75rem;
-            font-weight: 500;
-            cursor: pointer;
+        .logout-btn:hover {
+            background: rgba(225, 29, 72, 0.2);
+            transform: translateY(-2px);
         }
-
+        .admin-btn {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+        .admin-btn:hover {
+            background: rgba(16, 185, 129, 0.2);
+            transform: translateY(-2px);
+        }
         .user-email {
             font-size: 0.7rem;
-            color: var(--accent-green);
-            margin-right: 12px;
+            color: var(--neon-yellow);
+            background: rgba(255, 215, 0, 0.1);
+            padding: 6px 14px;
+            border-radius: 8px;
         }
 
-        .admin-btn {
-            background: transparent;
-            border: 1px solid var(--border-light);
-            padding: 8px 20px;
-            border-radius: 30px;
-            color: var(--text-secondary);
-            font-size: 0.75rem;
-            font-weight: 500;
-            cursor: pointer;
-        }
-
-        .admin-btn:hover {
-            border-color: var(--accent-red);
-            color: var(--accent-red);
-        }
-
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -229,672 +207,708 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.98);
+            backdrop-filter: blur(20px);
             z-index: 2000;
             justify-content: center;
             align-items: center;
         }
-
         .modal.active {
             display: flex;
+            animation: fadeIn 0.3s ease;
         }
-
         .modal-content {
-            background: rgba(15, 15, 18, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border-default);
-            border-radius: 24px;
+            background: linear-gradient(135deg, var(--standoff-card), #0c0c10);
+            border: 1px solid var(--neon-yellow);
+            border-radius: 16px;
             padding: 40px;
             width: 90%;
-            max-width: 420px;
+            max-width: 440px;
             position: relative;
         }
-
         .modal-close {
             position: absolute;
             top: 20px;
             right: 24px;
             font-size: 1.5rem;
             cursor: pointer;
-            color: var(--text-tertiary);
+            color: var(--text-muted);
+            transition: color 0.2s;
         }
-
         .modal-close:hover {
-            color: var(--accent-red);
+            color: var(--neon-yellow);
         }
-
         .modal h2 {
             font-family: 'Syne', sans-serif;
-            margin-bottom: 24px;
-            font-size: 1.5rem;
+            margin-bottom: 28px;
+            font-size: 1.6rem;
         }
-
         .modal input, .modal textarea {
             width: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid var(--border-default);
-            border-radius: 12px;
-            padding: 14px 16px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--standoff-border);
+            border-radius: 8px;
+            padding: 14px 18px;
             color: var(--text-primary);
             margin-bottom: 16px;
             font-size: 0.9rem;
-            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
         }
-
         .modal input:focus, .modal textarea:focus {
             outline: none;
-            border-color: var(--accent-red);
+            border-color: var(--neon-yellow);
         }
-
         .modal button {
             width: 100%;
-            background: var(--gradient-red);
+            background: var(--neon-yellow);
             border: none;
-            border-radius: 40px;
+            border-radius: 8px;
             padding: 14px;
-            color: white;
-            font-weight: 600;
+            color: var(--standoff-bg);
+            font-weight: 700;
             cursor: pointer;
             margin-top: 8px;
+            transition: all 0.2s;
         }
-
+        .modal button:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 20px var(--neon-yellow-glow);
+        }
         .modal-switch {
             text-align: center;
             margin-top: 20px;
-            color: var(--text-tertiary);
+            color: var(--text-muted);
             font-size: 0.8rem;
         }
-
         .modal-switch span {
-            color: var(--accent-green);
+            color: var(--neon-yellow);
             cursor: pointer;
+            font-weight: 500;
         }
 
-        .error-msg {
-            color: var(--accent-red);
-            font-size: 0.75rem;
-            margin-bottom: 12px;
-            text-align: center;
-        }
-
-        .success-msg {
-            color: var(--accent-green);
-            font-size: 0.75rem;
-            margin-bottom: 12px;
-            text-align: center;
-        }
-
+        /* Hero Section */
         .hero {
-            min-height: 95vh;
+            min-height: 100vh;
             display: flex;
             align-items: center;
-            padding: 140px 0 80px;
+            padding: 120px 0 80px;
         }
-
         .hero-badge {
+            display: inline-block;
             font-size: 0.7rem;
             text-transform: uppercase;
-            letter-spacing: 5px;
-            color: var(--accent-green);
-            margin-bottom: 24px;
+            letter-spacing: 4px;
+            color: var(--neon-yellow);
+            background: rgba(255, 215, 0, 0.1);
+            padding: 6px 16px;
+            border-radius: 8px;
+            margin-bottom: 28px;
         }
-
         .hero-title {
             font-family: 'Syne', sans-serif;
-            font-size: clamp(3rem, 8vw, 5.5rem);
+            font-size: clamp(3.5rem, 10vw, 6rem);
             font-weight: 800;
             line-height: 1.05;
-            margin-bottom: 24px;
+            margin-bottom: 28px;
             letter-spacing: -0.03em;
         }
-
-        .hero-title .red {
-            color: var(--accent-red);
+        .hero-title .neon {
+            color: var(--neon-yellow);
+            text-shadow: 0 0 30px var(--neon-yellow);
         }
-
         .hero-desc {
-            font-size: 1rem;
+            font-size: 1.05rem;
             color: var(--text-secondary);
             max-width: 520px;
-            margin-bottom: 36px;
+            margin-bottom: 40px;
             line-height: 1.6;
         }
-
         .hero-stats {
             display: flex;
-            gap: 48px;
-            margin-bottom: 44px;
+            gap: 56px;
+            margin-bottom: 48px;
+            flex-wrap: wrap;
         }
-
         .stat-number {
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: var(--accent-red);
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--neon-yellow);
             font-family: 'Syne', sans-serif;
         }
-
         .stat-label {
             font-size: 0.7rem;
-            color: var(--text-tertiary);
+            color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 1px;
         }
-
         .btn-primary {
             display: inline-flex;
             align-items: center;
             gap: 12px;
-            background: var(--gradient-red);
-            border: none;
-            padding: 16px 40px;
-            border-radius: 40px;
-            color: white;
+            background: transparent;
+            border: 2px solid var(--neon-yellow);
+            padding: 16px 44px;
+            border-radius: 8px;
+            color: var(--neon-yellow);
             font-weight: 700;
             font-size: 0.9rem;
             text-transform: uppercase;
             letter-spacing: 1.5px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
         }
-
         .btn-primary:hover {
-            transform: scale(1.02);
-            box-shadow: 0 0 25px rgba(225, 29, 72, 0.35);
-            gap: 16px;
+            background: var(--neon-yellow);
+            color: var(--standoff-bg);
+            gap: 18px;
+            box-shadow: 0 0 30px var(--neon-yellow-glow);
         }
 
+        /* Countdown */
         .countdown-section {
-            margin-top: 70px;
+            margin-top: 80px;
             padding-top: 40px;
-            border-top: 1px solid var(--border-default);
+            border-top: 1px solid rgba(255, 215, 0, 0.2);
         }
-
         .countdown-label {
             font-size: 0.7rem;
             text-transform: uppercase;
-            letter-spacing: 3px;
-            color: var(--text-tertiary);
-            margin-bottom: 16px;
+            letter-spacing: 4px;
+            color: var(--neon-yellow);
+            margin-bottom: 20px;
         }
-
         .countdown {
             display: flex;
-            gap: 20px;
+            gap: 24px;
             flex-wrap: wrap;
         }
-
         .countdown-item {
-            background: rgba(10, 10, 12, 0.5);
-            backdrop-filter: blur(8px);
-            border: 1px solid var(--border-default);
-            border-radius: 14px;
-            padding: 16px 24px;
-            min-width: 90px;
+            background: var(--standoff-card);
+            border: 1px solid var(--neon-yellow);
+            border-radius: 12px;
+            padding: 20px 28px;
+            min-width: 100px;
             text-align: center;
+            transition: all 0.2s;
         }
-
+        .countdown-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 20px var(--neon-yellow-glow);
+        }
         .countdown-number {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--accent-green);
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--neon-yellow);
             font-family: 'Syne', sans-serif;
         }
-
         .countdown-unit {
-            font-size: 0.65rem;
-            color: var(--text-tertiary);
+            font-size: 0.7rem;
+            color: var(--text-muted);
             text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .next-tournament-name {
+            margin-top: 20px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
         }
 
+        /* Sections */
         .section {
-            padding: 80px 0;
+            padding: 100px 0;
         }
-
         .section-header {
-            margin-bottom: 48px;
+            margin-bottom: 56px;
         }
-
         .section-tag {
             font-size: 0.7rem;
             text-transform: uppercase;
             letter-spacing: 5px;
-            color: var(--accent-green);
+            color: var(--neon-yellow);
             margin-bottom: 12px;
         }
-
         .section-title {
             font-family: 'Syne', sans-serif;
-            font-size: 2rem;
+            font-size: 2.2rem;
             font-weight: 700;
             letter-spacing: -0.02em;
         }
 
+        /* About */
         .about-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 60px;
+            gap: 70px;
             align-items: center;
         }
-
         .about-text {
             color: var(--text-secondary);
             line-height: 1.7;
-            font-size: 0.95rem;
+            font-size: 1rem;
         }
-
         .about-text p {
+            margin-bottom: 24px;
+        }
+        .about-card {
+            background: var(--standoff-card);
+            border: 1px solid var(--neon-yellow);
+            border-radius: 20px;
+            padding: 56px 40px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        .about-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 40px rgba(255, 215, 0, 0.1);
+        }
+        .about-card .big-letter {
+            font-size: 5rem;
+            font-weight: 800;
+            color: var(--neon-yellow);
+            font-family: 'Syne', sans-serif;
             margin-bottom: 20px;
         }
 
-        .about-card {
-            background: rgba(10, 10, 12, 0.4);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--border-default);
-            border-radius: 24px;
-            padding: 48px 32px;
-            text-align: center;
-        }
-
-        .about-card .big-letter {
-            font-size: 4rem;
-            font-weight: 800;
-            color: var(--accent-red);
-            font-family: 'Syne', sans-serif;
-            margin-bottom: 16px;
-        }
-
+        /* Tournament Cards */
         .tournaments-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-            gap: 28px;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 32px;
         }
-
         .tournament-card {
-            background: rgba(10, 10, 12, 0.5);
-            backdrop-filter: blur(8px);
-            border: 1px solid var(--border-default);
-            border-radius: 20px;
+            background: var(--standoff-card);
+            border: 1px solid var(--standoff-border);
+            border-radius: 16px;
             overflow: hidden;
-            transition: all 0.25s ease;
+            transition: all 0.3s;
+            animation: slideUp 0.5s ease;
         }
-
         .tournament-card:hover {
-            border-color: var(--accent-red);
-            transform: translateY(-4px);
+            border-color: var(--neon-yellow);
+            transform: translateY(-8px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
-
         .tournament-header {
-            padding: 20px 24px;
-            border-bottom: 1px solid var(--border-default);
-            background: rgba(20, 20, 24, 0.3);
+            padding: 24px;
+            border-bottom: 1px solid var(--standoff-border);
+            background: rgba(0, 0, 0, 0.3);
         }
-
         .tournament-name {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             font-weight: 700;
             margin-bottom: 6px;
         }
-
         .tournament-date {
-            font-size: 0.7rem;
-            color: var(--text-tertiary);
+            font-size: 0.75rem;
+            color: var(--text-muted);
         }
-
         .tournament-body {
-            padding: 20px 24px;
+            padding: 24px;
         }
-
         .tournament-info {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 16px;
+            gap: 10px;
+            margin-bottom: 20px;
         }
-
         .info-chip {
-            background: rgba(255, 255, 255, 0.03);
-            padding: 4px 12px;
-            border-radius: 30px;
+            background: rgba(255, 215, 0, 0.1);
+            padding: 5px 14px;
+            border-radius: 8px;
             font-size: 0.7rem;
-            color: var(--text-secondary);
+            color: var(--neon-yellow);
         }
-
         .tournament-prize {
-            background: rgba(16, 185, 129, 0.06);
-            padding: 12px;
-            border-radius: 10px;
-            margin: 12px 0;
+            background: rgba(16, 185, 129, 0.1);
+            padding: 14px;
+            border-radius: 12px;
+            margin: 16px 0;
             font-size: 0.75rem;
             color: var(--accent-green);
         }
-
         .tournament-status {
+            display: inline-block;
+            padding: 5px 14px;
+            border-radius: 8px;
             font-size: 0.7rem;
-            color: var(--accent-green);
+            font-weight: 600;
+            margin: 10px 0;
         }
-
-        .tournament-actions {
+        .tournament-status.open {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+        }
+        .tournament-status.full {
+            background: rgba(225, 29, 72, 0.15);
+            color: #e11d48;
+        }
+        .progress-bar {
+            height: 4px;
+            background: var(--standoff-border);
+            border-radius: 10px;
             margin-top: 16px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--neon-yellow);
+            border-radius: 10px;
+            transition: width 0.4s ease;
+        }
+        .tournament-actions {
+            margin-top: 20px;
             display: flex;
             gap: 12px;
             flex-wrap: wrap;
         }
-
         .edit-btn, .delete-btn, .register-team-btn, .view-teams-btn {
-            padding: 6px 14px;
-            border-radius: 30px;
+            padding: 8px 16px;
+            border-radius: 8px;
             font-size: 0.7rem;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
             border: none;
+            transition: all 0.2s;
         }
-
         .edit-btn {
-            background: rgba(16, 185, 129, 0.12);
+            background: rgba(16, 185, 129, 0.15);
             color: var(--accent-green);
         }
-
+        .edit-btn:hover {
+            background: rgba(16, 185, 129, 0.3);
+            transform: translateY(-2px);
+        }
         .delete-btn {
-            background: rgba(225, 29, 72, 0.12);
+            background: rgba(225, 29, 72, 0.15);
             color: var(--accent-red);
         }
-
+        .delete-btn:hover {
+            background: rgba(225, 29, 72, 0.3);
+            transform: translateY(-2px);
+        }
         .register-team-btn {
-            background: rgba(225, 29, 72, 0.12);
-            color: var(--accent-red);
+            background: rgba(255, 215, 0, 0.15);
+            color: var(--neon-yellow);
         }
-
+        .register-team-btn:hover {
+            background: rgba(255, 215, 0, 0.3);
+            transform: translateY(-2px);
+        }
         .view-teams-btn {
-            background: rgba(59, 130, 246, 0.12);
+            background: rgba(59, 130, 246, 0.15);
             color: #3b82f6;
         }
+        .view-teams-btn:hover {
+            background: rgba(59, 130, 246, 0.3);
+            transform: translateY(-2px);
+        }
 
+        /* Admin Panel */
         .admin-panel {
-            background: rgba(10, 10, 12, 0.7);
-            backdrop-filter: blur(16px);
-            border: 1px solid var(--border-default);
-            border-radius: 24px;
-            padding: 32px;
-            margin-bottom: 48px;
+            background: var(--standoff-card);
+            border: 1px solid var(--neon-yellow);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 56px;
             display: none;
         }
-
         .admin-panel.active {
             display: block;
+            animation: slideUp 0.4s ease;
         }
-
         .admin-title {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 24px;
-            color: var(--accent-red);
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 28px;
+            color: var(--neon-yellow);
         }
-
         .admin-form {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
+            gap: 20px;
         }
-
         .admin-form .full-width {
             grid-column: span 2;
         }
-
         .admin-form input, .admin-form textarea {
             background: rgba(0, 0, 0, 0.5);
-            border: 1px solid var(--border-default);
-            border-radius: 12px;
-            padding: 12px 16px;
+            border: 1px solid var(--standoff-border);
+            border-radius: 8px;
+            padding: 14px 18px;
             color: var(--text-primary);
             font-size: 0.85rem;
-            font-family: 'Inter', sans-serif;
         }
-
         .admin-form input:focus, .admin-form textarea:focus {
             outline: none;
-            border-color: var(--accent-red);
+            border-color: var(--neon-yellow);
         }
-
         .admin-form button {
-            background: var(--gradient-red);
+            background: var(--neon-yellow);
             border: none;
-            border-radius: 40px;
-            padding: 12px 24px;
-            color: white;
-            font-weight: 600;
-            font-size: 0.8rem;
+            border-radius: 8px;
+            padding: 14px 28px;
+            color: var(--standoff-bg);
+            font-weight: 700;
             cursor: pointer;
+            transition: all 0.2s;
+        }
+        .admin-form button:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 15px var(--neon-yellow-glow);
         }
 
+        /* Rules */
         .rules-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 24px;
+            gap: 28px;
         }
-
         .rule-card {
-            background: rgba(10, 10, 12, 0.4);
-            backdrop-filter: blur(8px);
-            border: 1px solid var(--border-default);
-            border-radius: 18px;
-            padding: 24px 20px;
+            background: var(--standoff-card);
+            border: 1px solid var(--standoff-border);
+            border-radius: 16px;
+            padding: 32px 24px;
             text-align: center;
-            transition: all 0.2s;
+            transition: all 0.3s;
         }
-
         .rule-card:hover {
-            border-color: var(--accent-green);
+            border-color: var(--neon-yellow);
+            transform: translateY(-5px);
         }
-
         .rule-card i {
-            font-size: 1.6rem;
-            color: var(--accent-green);
-            margin-bottom: 14px;
+            font-size: 2rem;
+            color: var(--neon-yellow);
+            margin-bottom: 16px;
         }
-
         .rule-card h3 {
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
-
         .rule-card p {
-            font-size: 0.7rem;
-            color: var(--text-tertiary);
+            font-size: 0.75rem;
+            color: var(--text-muted);
         }
 
+        /* Social */
         .social-section {
-            border-top: 1px solid var(--border-default);
-            border-bottom: 1px solid var(--border-default);
-            padding: 60px 0;
+            border-top: 1px solid rgba(255, 215, 0, 0.2);
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+            padding: 80px 0;
             text-align: center;
         }
-
         .social-buttons {
             display: flex;
-            gap: 20px;
+            gap: 24px;
             justify-content: center;
-            margin-top: 32px;
+            margin-top: 40px;
             flex-wrap: wrap;
         }
-
         .social-btn {
             background: transparent;
-            border: 1px solid var(--border-light);
-            padding: 12px 28px;
-            border-radius: 40px;
-            color: var(--text-secondary);
+            border: 1px solid var(--neon-yellow);
+            padding: 14px 32px;
+            border-radius: 8px;
+            color: var(--neon-yellow);
             font-weight: 500;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             cursor: pointer;
             transition: all 0.2s;
         }
-
         .social-btn:hover {
-            border-color: var(--accent-green);
-            color: var(--accent-green);
+            background: var(--neon-yellow);
+            color: var(--standoff-bg);
+            transform: translateY(-3px);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--neon-yellow);
+            color: var(--standoff-bg);
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            z-index: 3000;
+            animation: slideUp 0.3s ease;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
         }
 
         .footer {
-            padding: 40px 0;
+            padding: 50px 0;
             text-align: center;
-            color: var(--text-tertiary);
-            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-size: 0.75rem;
         }
-
         .empty-state {
             text-align: center;
-            padding: 60px;
-            background: rgba(10, 10, 12, 0.4);
-            backdrop-filter: blur(8px);
+            padding: 80px;
+            background: var(--standoff-card);
             border-radius: 20px;
-            color: var(--text-tertiary);
+            color: var(--text-muted);
         }
-
         .teams-list-modal {
             max-width: 700px !important;
             max-height: 80vh;
             overflow-y: auto;
         }
-
         .team-item {
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(255, 215, 0, 0.05);
             border-radius: 12px;
-            padding: 16px;
+            padding: 20px;
             margin-bottom: 16px;
         }
-
         .team-name {
             font-size: 1rem;
             font-weight: 700;
-            color: var(--accent-red);
-            margin-bottom: 8px;
+            color: var(--neon-yellow);
+            margin-bottom: 12px;
         }
-
         .player-row {
             font-size: 0.75rem;
             color: var(--text-secondary);
-            padding: 4px 0;
-            border-bottom: 1px solid var(--border-default);
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.1);
         }
 
+        /* Responsive */
         @media (max-width: 768px) {
             .container { padding: 0 20px; }
-            .nav-container { flex-direction: column; gap: 12px; padding: 14px 20px; }
-            .nav-links { gap: 28px; }
-            .hero-stats { gap: 28px; }
+            .nav-container { padding: 14px 20px; }
+            .nav-links { 
+                display: none;
+                position: absolute;
+                top: 65px;
+                left: 0;
+                right: 0;
+                background: rgba(10, 10, 12, 0.98);
+                backdrop-filter: blur(20px);
+                flex-direction: column;
+                padding: 24px;
+                text-align: center;
+                border-bottom: 1px solid var(--neon-yellow);
+            }
+            .nav-links.active { display: flex; }
+            .hamburger { display: block; }
+            .hero-stats { gap: 32px; }
             .about-grid { grid-template-columns: 1fr; gap: 40px; }
             .rules-grid { grid-template-columns: repeat(2, 1fr); }
             .admin-form { grid-template-columns: 1fr; }
             .admin-form .full-width { grid-column: span 1; }
             .tournaments-grid { grid-template-columns: 1fr; }
-            .auth-buttons { flex-direction: column; gap: 8px; }
+            .countdown-item { padding: 14px 18px; min-width: 70px; }
+            .countdown-number { font-size: 1.5rem; }
+            .auth-buttons { gap: 8px; }
+            .login-btn, .register-btn, .logout-btn, .admin-btn { padding: 6px 14px; font-size: 0.7rem; }
         }
-
         @media (max-width: 480px) {
             .rules-grid { grid-template-columns: 1fr; }
-            .countdown-item { padding: 10px 14px; min-width: 65px; }
-            .countdown-number { font-size: 1.2rem; }
+            .hero-stats { gap: 20px; }
+            .stat-number { font-size: 1.5rem; }
+        }
+        @media (max-width: 380px) {
+            .auth-buttons { flex-direction: column; width: 100%; }
+            .login-btn, .register-btn, .logout-btn, .admin-btn { width: 100%; text-align: center; }
         }
     </style>
 </head>
 <body>
 
-<div class="bg">
-    <div class="bg-gradient"></div>
-    <div class="bg-orb orb-1"></div>
-    <div class="bg-orb orb-2"></div>
-    <div class="bg-orb orb-3"></div>
-    <div class="bg-noise"></div>
-</div>
+<canvas id="canvas-bg"></canvas>
 
 <div class="content">
     <nav class="navbar">
         <div class="nav-container">
             <div class="logo">HEJTERI</div>
-            <div class="nav-links">
-                <a href="#home">Home</a>
-                <a href="#about">About</a>
-                <a href="#tournaments">Tournaments</a>
-                <a href="#rules">Rules</a>
+            <div class="hamburger" id="hamburgerBtn">☰</div>
+            <div class="nav-links" id="navLinks">
+                <a href="#home">HOME</a>
+                <a href="#about">ABOUT</a>
+                <a href="#tournaments">TOURNAMENTS</a>
+                <a href="#rules">RULES</a>
             </div>
             <div class="auth-buttons" id="unauthButtons">
-                <button class="login-btn" id="showLoginBtn">Login</button>
-                <button class="register-btn" id="showRegisterBtn">Register</button>
+                <button class="login-btn" id="showLoginBtn">LOGIN</button>
+                <button class="register-btn" id="showRegisterBtn">REGISTER</button>
             </div>
             <div class="auth-buttons" id="authButtons" style="display: none;">
                 <span class="user-email" id="userEmail"></span>
-                <button class="logout-btn" id="logoutBtn">Logout</button>
-                <button class="admin-btn" id="adminToggleBtn">Admin</button>
+                <button class="logout-btn" id="logoutBtn">LOGOUT</button>
+                <button class="admin-btn" id="adminToggleBtn">ADMIN</button>
             </div>
         </div>
     </nav>
 
-    <!-- LOGIN MODAL -->
+    <!-- Login Modal -->
     <div id="loginModal" class="modal">
         <div class="modal-content">
             <span class="modal-close" onclick="closeModal('loginModal')">&times;</span>
-            <h2>Login</h2>
-            <div id="loginError" class="error-msg"></div>
-            <input type="email" id="loginEmail" placeholder="Email">
+            <h2>WELCOME BACK</h2>
+            <div id="loginError" class="error-msg" style="color: #e11d48; font-size:0.75rem; margin-bottom:12px;"></div>
+            <input type="email" id="loginEmail" placeholder="Email address">
             <input type="password" id="loginPassword" placeholder="Password">
-            <button onclick="login()">Login</button>
+            <button onclick="login()">LOGIN</button>
             <div class="modal-switch">
-                Don't have an account? <span onclick="switchToRegister()">Register</span>
+                No account? <span onclick="switchToRegister()">CREATE ONE</span>
             </div>
         </div>
     </div>
 
-    <!-- REGISTER MODAL -->
+    <!-- Register Modal -->
     <div id="registerModal" class="modal">
         <div class="modal-content">
             <span class="modal-close" onclick="closeModal('registerModal')">&times;</span>
-            <h2>Register</h2>
-            <div id="registerError" class="error-msg"></div>
-            <div id="registerSuccess" class="success-msg"></div>
+            <h2>CREATE ACCOUNT</h2>
+            <div id="registerError" class="error-msg" style="color: #e11d48; font-size:0.75rem; margin-bottom:12px;"></div>
+            <div id="registerSuccess" class="success-msg" style="color: #10b981; font-size:0.75rem; margin-bottom:12px;"></div>
             <input type="text" id="registerUsername" placeholder="Username">
             <input type="email" id="registerEmail" placeholder="Email">
-            <input type="password" id="registerPassword" placeholder="Password (min. 6 characters)">
-            <button onclick="register()">Register</button>
+            <input type="password" id="registerPassword" placeholder="Password (min 6 chars)">
+            <button onclick="register()">REGISTER</button>
             <div class="modal-switch">
-                Already have an account? <span onclick="switchToLogin()">Login</span>
+                Already have an account? <span onclick="switchToLogin()">LOGIN</span>
             </div>
         </div>
     </div>
 
+    <!-- Hero Section -->
     <section id="home" class="hero">
         <div class="container">
             <div class="hero-badge">STANDOFF 2 • BALKAN CIRCUIT</div>
             <h1 class="hero-title">
-                <span class="red">HEJTERI</span><br>
+                <span class="neon">HEJTERI</span><br>
                 Tournament Series
             </h1>
             <p class="hero-desc">
                 Professional Standoff 2 tournaments with strict anti-cheat, experienced admins, and competitive prize pools.
             </p>
             <div class="hero-stats">
-                <div><div class="stat-number">500+</div><div class="stat-label">Teams</div></div>
-                <div><div class="stat-number">€10K+</div><div class="stat-label">Prize Pool</div></div>
-                <div><div class="stat-number">24/7</div><div class="stat-label">Support</div></div>
+                <div><div class="stat-number">500+</div><div class="stat-label">TEAMS</div></div>
+                <div><div class="stat-number">€10K+</div><div class="stat-label">PRIZE POOL</div></div>
+                <div><div class="stat-number">24/7</div><div class="stat-label">SUPPORT</div></div>
             </div>
             <button class="btn-primary" id="contactBtn">
-                Register Now
+                REGISTER NOW
                 <i class="fas fa-arrow-right"></i>
             </button>
 
             <div class="countdown-section">
-                <div class="countdown-label">Next tournament starts in</div>
+                <div class="countdown-label">NEXT TOURNAMENT STARTS IN</div>
                 <div class="countdown">
-                    <div class="countdown-item"><div class="countdown-number" id="days">--</div><div class="countdown-unit">Days</div></div>
-                    <div class="countdown-item"><div class="countdown-number" id="hours">--</div><div class="countdown-unit">Hours</div></div>
-                    <div class="countdown-item"><div class="countdown-number" id="minutes">--</div><div class="countdown-unit">Minutes</div></div>
-                    <div class="countdown-item"><div class="countdown-number" id="seconds">--</div><div class="countdown-unit">Seconds</div></div>
+                    <div class="countdown-item"><div class="countdown-number" id="days">--</div><div class="countdown-unit">DAYS</div></div>
+                    <div class="countdown-item"><div class="countdown-number" id="hours">--</div><div class="countdown-unit">HOURS</div></div>
+                    <div class="countdown-item"><div class="countdown-number" id="minutes">--</div><div class="countdown-unit">MINUTES</div></div>
+                    <div class="countdown-item"><div class="countdown-number" id="seconds">--</div><div class="countdown-unit">SECONDS</div></div>
                 </div>
+                <div class="next-tournament-name" id="nextTournamentName"></div>
             </div>
         </div>
     </section>
 
+    <!-- About Section -->
     <section id="about" class="section">
         <div class="container">
             <div class="about-grid">
@@ -910,12 +924,13 @@
                 <div class="about-card">
                     <div class="big-letter">H</div>
                     <div style="font-weight: 600; margin-bottom: 6px;">Zero tolerance policy</div>
-                    <p style="font-size: 0.75rem; color: var(--text-tertiary);">Cheating = permanent ban for the entire team</p>
+                    <p style="font-size: 0.8rem; color: var(--text-muted);">Cheating = permanent ban for the entire team</p>
                 </div>
             </div>
         </div>
     </section>
 
+    <!-- Tournaments Section -->
     <section id="tournaments" class="section">
         <div class="container">
             <div class="section-header">
@@ -924,7 +939,7 @@
             </div>
 
             <div id="adminPanel" class="admin-panel">
-                <div class="admin-title">Tournament Management</div>
+                <div class="admin-title">⚙️ TOURNAMENT MANAGEMENT</div>
                 <form id="tournamentForm" class="admin-form">
                     <input type="text" id="tournamentName" placeholder="Tournament name" required>
                     <input type="text" id="tournamentDate" placeholder="Date (e.g., 28 June 2026)" required>
@@ -932,7 +947,7 @@
                     <input type="text" id="tournamentPrize" placeholder="Prize pool" required>
                     <textarea id="tournamentDetails" class="full-width" rows="2" placeholder="Prize breakdown..."></textarea>
                     <input type="number" id="tournamentSlots" placeholder="Team slots" value="16">
-                    <button type="submit" class="full-width">Add Tournament</button>
+                    <button type="submit" class="full-width">➕ ADD TOURNAMENT</button>
                 </form>
             </div>
 
@@ -940,6 +955,7 @@
         </div>
     </section>
 
+    <!-- Rules Section -->
     <section id="rules" class="section">
         <div class="container">
             <div class="section-header">
@@ -947,22 +963,23 @@
                 <h2 class="section-title">Tournament rules</h2>
             </div>
             <div class="rules-grid">
-                <div class="rule-card"><i class="fas fa-ban"></i><h3>Anti-Cheat</h3><p>Zero tolerance. Lifetime ban for cheating.</p></div>
-                <div class="rule-card"><i class="fab fa-discord"></i><h3>Discord Required</h3><p>All check-ins via official Discord.</p></div>
-                <div class="rule-card"><i class="fas fa-handshake"></i><h3>Fair Play</h3><p>Respect opponents and admins.</p></div>
-                <div class="rule-card"><i class="fas fa-clock"></i><h3>Punctuality</h3><p>15min grace period, then forfeit.</p></div>
+                <div class="rule-card"><i class="fas fa-ban"></i><h3>ANTI-CHEAT</h3><p>Zero tolerance. Lifetime ban for cheating.</p></div>
+                <div class="rule-card"><i class="fab fa-discord"></i><h3>DISCORD REQUIRED</h3><p>All check-ins via official Discord.</p></div>
+                <div class="rule-card"><i class="fas fa-handshake"></i><h3>FAIR PLAY</h3><p>Respect opponents and admins.</p></div>
+                <div class="rule-card"><i class="fas fa-clock"></i><h3>PUNCTUALITY</h3><p>15min grace period, then forfeit.</p></div>
             </div>
         </div>
     </section>
 
+    <!-- Social Section -->
     <div class="social-section">
         <div class="container">
             <div class="section-tag">CONNECT</div>
             <h2 class="section-title" style="margin-bottom: 8px;">Join the community</h2>
             <div class="social-buttons">
-                <button class="social-btn" id="discordBtn"><i class="fab fa-discord"></i> Discord</button>
-                <button class="social-btn" id="instagramBtn"><i class="fab fa-instagram"></i> Instagram</button>
-                <button class="social-btn" id="emailBtn"><i class="fas fa-envelope"></i> Contact</button>
+                <button class="social-btn" id="discordBtn"><i class="fab fa-discord"></i> DISCORD</button>
+                <button class="social-btn" id="instagramBtn"><i class="fab fa-instagram"></i> INSTAGRAM</button>
+                <button class="social-btn" id="emailBtn"><i class="fas fa-envelope"></i> CONTACT</button>
             </div>
         </div>
     </div>
@@ -980,15 +997,103 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
 <script>
-    // Firebase configuration
+    // Canvas Particle Background
+    const canvas = document.getElementById('canvas-bg');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let mouseX = 0, mouseY = 0;
+    let canvasWidth, canvasHeight;
+
+    function resizeCanvas() {
+        canvasWidth = window.innerWidth;
+        canvasHeight = window.innerHeight;
+        canvas.width = canvasWidth;
+        canvas.height = canvasHeight;
+    }
+
+    class Particle {
+        constructor() {
+            this.x = Math.random() * canvasWidth;
+            this.y = Math.random() * canvasHeight;
+            this.vx = (Math.random() - 0.5) * 0.5;
+            this.vy = (Math.random() - 0.5) * 0.5;
+            this.radius = Math.random() * 2 + 1;
+            this.opacity = Math.random() * 0.5 + 0.2;
+        }
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            if (this.x < 0) this.x = canvasWidth;
+            if (this.x > canvasWidth) this.x = 0;
+            if (this.y < 0) this.y = canvasHeight;
+            if (this.y > canvasHeight) this.y = 0;
+        }
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(255, 215, 0, ${this.opacity})`;
+            ctx.fill();
+        }
+    }
+
+    function initParticles() {
+        particles = [];
+        const particleCount = Math.min(100, Math.floor(window.innerWidth / 20));
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new Particle());
+        }
+    }
+
+    function drawLines() {
+        for (let i = 0; i < particles.length; i++) {
+            for (let j = i + 1; j < particles.length; j++) {
+                const dx = particles[i].x - particles[j].x;
+                const dy = particles[i].y - particles[j].y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                if (distance < 150) {
+                    ctx.beginPath();
+                    ctx.moveTo(particles[i].x, particles[i].y);
+                    ctx.lineTo(particles[j].x, particles[j].y);
+                    const opacity = (1 - distance / 150) * 0.15;
+                    ctx.strokeStyle = `rgba(255, 215, 0, ${opacity})`;
+                    ctx.lineWidth = 0.5;
+                    ctx.stroke();
+                }
+            }
+        }
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+        ctx.fillStyle = '#0a0a0c';
+        ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+        
+        particles.forEach(p => {
+            p.update();
+            p.draw();
+        });
+        drawLines();
+        
+        requestAnimationFrame(animate);
+    }
+
+    window.addEventListener('resize', () => {
+        resizeCanvas();
+        initParticles();
+    });
+
+    resizeCanvas();
+    initParticles();
+    animate();
+
+    // Firebase Config
     const firebaseConfig = {
         apiKey: "AIzaSyBkgVgSHnp--SlD2UANQnl_Ez6Cdt1Lbes",
         authDomain: "hejteri-da76d.firebaseapp.com",
         projectId: "hejteri-da76d",
         storageBucket: "hejteri-da76d.firebasestorage.app",
         messagingSenderId: "32456880842",
-        appId: "1:32456880842:web:d38b7fb7d81ab17c0bfa33",
-        measurementId: "G-7XYCZ0SEQF"
+        appId: "1:32456880842:web:d38b7fb7d81ab17c0bfa33"
     };
 
     firebase.initializeApp(firebaseConfig);
@@ -998,7 +1103,18 @@
     let tournaments = [];
     let countdownInterval = null;
 
-    // ============ TOURNAMENT FUNCTIONS ============
+    function showToast(message, isError = false) {
+        const existing = document.querySelector('.toast');
+        if (existing) existing.remove();
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.style.background = isError ? '#e11d48' : '#FFD700';
+        toast.style.color = isError ? 'white' : '#0a0a0c';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+
     function loadTournaments() {
         const saved = localStorage.getItem('hejteri_tournaments');
         if (saved) {
@@ -1013,7 +1129,7 @@
             saveTournaments();
         }
         renderTournaments();
-        updateCountdownFromTournaments();
+        updateCountdown();
     }
 
     function saveTournaments() {
@@ -1023,391 +1139,227 @@
     function escapeHtml(str) {
         if (!str) return '';
         return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
+            return m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;';
         });
     }
 
     function parseDateFromString(dateStr, timeStr) {
         const months = {
-            'january': 0, 'february': 1, 'march': 2, 'april': 3, 'may': 4, 'june': 5,
-            'july': 6, 'august': 7, 'september': 8, 'october': 9, 'november': 10, 'december': 11,
-            'januar': 0, 'februar': 1, 'mart': 2, 'april': 3, 'maj': 4, 'juni': 5,
-            'juli': 6, 'august': 7, 'septembar': 8, 'oktobar': 9, 'novembar': 10, 'decembar': 11
+            'january':0,'february':1,'march':2,'april':3,'may':4,'june':5,
+            'july':6,'august':7,'september':8,'october':9,'november':10,'december':11,
+            'januar':0,'februar':1,'mart':2,'april':3,'maj':4,'juni':5,
+            'juli':6,'august':7,'septembar':8,'oktobar':9,'novembar':10,'decembar':11
         };
-        
         const parts = dateStr.split(' ');
         if (parts.length < 3) return null;
-        
         const day = parseInt(parts[0]);
         const monthName = parts[1].toLowerCase();
         const year = parseInt(parts[2]);
-        
         const month = months[monthName];
         if (month === undefined) return null;
-        
         let hour = 19, minute = 0;
         if (timeStr) {
-            const timeMatch = timeStr.match(/(\d{1,2}):(\d{2})/);
-            if (timeMatch) {
-                hour = parseInt(timeMatch[1]);
-                minute = parseInt(timeMatch[2]);
-            }
+            const match = timeStr.match(/(\d{1,2}):(\d{2})/);
+            if (match) { hour = parseInt(match[1]); minute = parseInt(match[2]); }
         }
-        
         return new Date(year, month, day, hour, minute, 0);
     }
 
     function getNextTournament() {
-        if (!tournaments || tournaments.length === 0) return null;
-        
+        if (!tournaments.length) return null;
         const now = new Date();
-        let nextTournament = null;
-        let nextDate = null;
-        
-        for (const tournament of tournaments) {
-            const tournamentDate = parseDateFromString(tournament.date, tournament.time);
-            if (tournamentDate && tournamentDate > now) {
-                if (!nextDate || tournamentDate < nextDate) {
-                    nextDate = tournamentDate;
-                    nextTournament = tournament;
-                }
+        let next = null, nextDate = null;
+        for (const t of tournaments) {
+            const d = parseDateFromString(t.date, t.time);
+            if (d && d > now && (!nextDate || d < nextDate)) {
+                nextDate = d;
+                next = t;
             }
         }
-        
-        return nextTournament ? { tournament: nextTournament, date: nextDate } : null;
+        return next ? { tournament: next, date: nextDate } : null;
     }
 
-    function updateCountdownFromTournaments() {
+    function updateCountdown() {
         const next = getNextTournament();
         const daysEl = document.getElementById('days');
         const hoursEl = document.getElementById('hours');
         const minutesEl = document.getElementById('minutes');
         const secondsEl = document.getElementById('seconds');
+        const nameEl = document.getElementById('nextTournamentName');
         
         if (!next) {
-            if (daysEl) daysEl.innerText = '--';
-            if (hoursEl) hoursEl.innerText = '--';
-            if (minutesEl) minutesEl.innerText = '--';
-            if (secondsEl) secondsEl.innerText = '--';
+            if(daysEl) daysEl.innerText = '--';
+            if(hoursEl) hoursEl.innerText = '--';
+            if(minutesEl) minutesEl.innerText = '--';
+            if(secondsEl) secondsEl.innerText = '--';
+            if(nameEl) nameEl.innerText = '';
             return;
         }
         
-        if (countdownInterval) clearInterval(countdownInterval);
+        if(nameEl) nameEl.innerText = `Next: ${escapeHtml(next.tournament.name)}`;
+        if(countdownInterval) clearInterval(countdownInterval);
         
         function update() {
-            const now = new Date();
-            const diff = next.date - now;
-            
-            if (diff <= 0) {
-                updateCountdownFromTournaments();
-                return;
-            }
-            
-            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const diff = next.date - new Date();
+            if(diff <= 0) { updateCountdown(); return; }
+            const days = Math.floor(diff / 86400000);
             const hours = Math.floor((diff % 86400000) / 3600000);
-            const minutes = Math.floor((diff % 3600000) / 60000);
-            const seconds = Math.floor((diff % 60000) / 1000);
-            
-            if (daysEl) daysEl.innerText = days < 10 ? '0' + days : days;
-            if (hoursEl) hoursEl.innerText = hours < 10 ? '0' + hours : hours;
-            if (minutesEl) minutesEl.innerText = minutes < 10 ? '0' + minutes : minutes;
-            if (secondsEl) secondsEl.innerText = seconds < 10 ? '0' + seconds : seconds;
+            const mins = Math.floor((diff % 3600000) / 60000);
+            const secs = Math.floor((diff % 60000) / 1000);
+            if(daysEl) daysEl.innerText = days < 10 ? '0'+days : days;
+            if(hoursEl) hoursEl.innerText = hours < 10 ? '0'+hours : hours;
+            if(minutesEl) minutesEl.innerText = mins < 10 ? '0'+mins : mins;
+            if(secondsEl) secondsEl.innerText = secs < 10 ? '0'+secs : secs;
         }
-        
         update();
         countdownInterval = setInterval(update, 1000);
     }
 
     function addTournament(name, date, time, prize, details, slots) {
         tournaments.push({
-            id: Date.now(),
-            name: name,
-            date: date,
-            time: time,
-            prize: prize,
-            details: details,
-            slots: parseInt(slots),
-            registeredTeams: []
+            id: Date.now(), name, date, time, prize, details,
+            slots: parseInt(slots), registeredTeams: []
         });
         saveTournaments();
         renderTournaments();
-        updateCountdownFromTournaments();
+        updateCountdown();
+        showToast('Tournament added!');
     }
 
     window.deleteTournament = function(id) {
-        if (confirm('Delete this tournament?')) {
+        if(confirm('Delete this tournament?')) {
             tournaments = tournaments.filter(t => t.id !== id);
             saveTournaments();
             renderTournaments();
-            updateCountdownFromTournaments();
+            updateCountdown();
+            showToast('Tournament deleted');
         }
     };
 
     window.editTournament = function(id) {
         const t = tournaments.find(t => t.id === id);
-        if (!t) return;
+        if(!t) return;
         const newName = prompt('Tournament name:', t.name);
-        if (newName && newName.trim()) t.name = newName;
+        if(newName?.trim()) t.name = newName;
         const newDate = prompt('Date:', t.date);
-        if (newDate && newDate.trim()) t.date = newDate;
+        if(newDate?.trim()) t.date = newDate;
         const newTime = prompt('Time:', t.time);
-        if (newTime && newTime.trim()) t.time = newTime;
+        if(newTime?.trim()) t.time = newTime;
         const newPrize = prompt('Prize pool:', t.prize);
-        if (newPrize && newPrize.trim()) t.prize = newPrize;
+        if(newPrize?.trim()) t.prize = newPrize;
         saveTournaments();
         renderTournaments();
-        updateCountdownFromTournaments();
+        updateCountdown();
+        showToast('Tournament updated');
     };
 
-    // ============ VIEW REGISTERED TEAMS FOR ADMIN ============
-    window.viewRegisteredTeams = function(tournamentId) {
-        const tournament = tournaments.find(t => t.id === tournamentId);
-        if (!tournament || !tournament.registeredTeams || tournament.registeredTeams.length === 0) {
-            alert('No teams registered for this tournament.');
+    window.viewRegisteredTeams = function(id) {
+        const t = tournaments.find(t => t.id === id);
+        if(!t?.registeredTeams?.length) {
+            showToast('No teams registered', true);
             return;
         }
-
-        const existingModal = document.getElementById('teamsListModal');
-        if (existingModal) existingModal.remove();
-
+        const existing = document.getElementById('teamsListModal');
+        if(existing) existing.remove();
         const modal = document.createElement('div');
         modal.id = 'teamsListModal';
         modal.className = 'modal active';
         modal.style.display = 'flex';
-
-        let teamsHtml = '';
-        tournament.registeredTeams.forEach((team, idx) => {
-            let playersHtml = '';
-            playersHtml += `<div class="player-row">👑 Captain: ${escapeHtml(team.captainDiscord)} (SO2: ${escapeHtml(team.captainSo2Id)}) - ${escapeHtml(team.captainEmail)}</div>`;
-            
-            team.players.forEach((player, pIdx) => {
-                playersHtml += `<div class="player-row">👤 Player ${pIdx + 1}: ${escapeHtml(player.discord)} (SO2: ${escapeHtml(player.so2Id)})</div>`;
+        let html = '';
+        t.registeredTeams.forEach(team => {
+            let playersHtml = `<div class="player-row">👑 Captain: ${escapeHtml(team.captainDiscord)} (SO2: ${escapeHtml(team.captainSo2Id)})</div>`;
+            team.players.forEach((p, i) => {
+                playersHtml += `<div class="player-row">👤 Player ${i+1}: ${escapeHtml(p.discord)} (SO2: ${escapeHtml(p.so2Id)})</div>`;
             });
-            
-            teamsHtml += `
-                <div class="team-item">
-                    <div class="team-name">🏆 ${escapeHtml(team.teamName)}</div>
-                    ${playersHtml}
-                    <div class="player-row" style="border-bottom: none; margin-top: 8px; color: var(--text-tertiary);">Registered: ${new Date(team.registeredAt).toLocaleString()}</div>
-                </div>
-            `;
+            html += `<div class="team-item"><div class="team-name">🏆 ${escapeHtml(team.teamName)}</div>${playersHtml}</div>`;
         });
-
-        modal.innerHTML = `
-            <div class="modal-content teams-list-modal">
-                <span class="modal-close" onclick="this.closest('.modal').remove()">&times;</span>
-                <h2 style="font-size: 1.3rem;">Registered Teams - ${escapeHtml(tournament.name)}</h2>
-                <div style="margin-bottom: 16px; color: var(--accent-green);">Total: ${tournament.registeredTeams.length}/${tournament.slots} teams</div>
-                ${teamsHtml}
-            </div>
-        `;
-        
+        modal.innerHTML = `<div class="modal-content teams-list-modal"><span class="modal-close" onclick="this.closest('.modal').remove()">&times;</span><h2>Teams - ${escapeHtml(t.name)}</h2><div style="margin-bottom:16px;color:var(--neon-yellow);">${t.registeredTeams.length}/${t.slots} teams</div>${html}</div>`;
         document.body.appendChild(modal);
     };
 
-    // ============ TEAM REGISTRATION (CAPTAIN ONLY) ============
-    window.openTeamRegistrationModal = function(tournamentId) {
+    window.openTeamRegistrationModal = function(id) {
         const user = auth.currentUser;
-        if (!user) {
-            alert('You must be logged in to register a team.');
-            openModal('loginModal');
-            return;
+        if(!user) { showToast('Login first!', true); openModal('loginModal'); return; }
+        const t = tournaments.find(t => t.id === id);
+        if(!t) return;
+        if(t.registeredTeams?.some(team => team.captainId === user.uid)) {
+            showToast('You already registered a team!', true); return;
         }
-        
-        const tournament = tournaments.find(t => t.id === tournamentId);
-        if (!tournament) {
-            alert('Tournament does not exist.');
-            return;
+        if(t.registeredTeams?.length >= t.slots) {
+            showToast('Tournament full!', true); return;
         }
-        
-        const alreadyCaptain = tournament.registeredTeams?.some(team => team.captainId === user.uid);
-        if (alreadyCaptain) {
-            alert('You are already a captain of a team in this tournament. Only one team per tournament.');
-            return;
-        }
-        
-        const isMember = tournament.registeredTeams?.some(team => team.players.some(p => p.userId === user.uid));
-        if (isMember) {
-            alert('You are already a member of a team registered for this tournament.');
-            return;
-        }
-        
-        if (tournament.registeredTeams && tournament.registeredTeams.length >= tournament.slots) {
-            alert('Tournament is already full!');
-            return;
-        }
-        
-        showTeamRegistrationForm(tournamentId, tournament);
+        showTeamForm(id, t);
     };
 
-    function showTeamRegistrationForm(tournamentId, tournament) {
-        const existingModal = document.getElementById('teamRegistrationModal');
-        if (existingModal) existingModal.remove();
-        
+    function showTeamForm(id, t) {
+        const existing = document.getElementById('teamRegistrationModal');
+        if(existing) existing.remove();
         const modal = document.createElement('div');
         modal.id = 'teamRegistrationModal';
         modal.className = 'modal active';
         modal.style.display = 'flex';
-        
         let playersHtml = '';
-        for (let i = 1; i <= 4; i++) {
-            playersHtml += `
-                <div style="margin-bottom: 20px; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 12px;">
-                    <div style="font-size: 0.8rem; color: var(--accent-green); margin-bottom: 8px;">Player ${i}</div>
-                    <input type="text" id="playerDiscord_${i}" placeholder="Discord username (e.g., player#1234)" style="margin-bottom: 8px;">
-                    <input type="text" id="playerSo2Id_${i}" placeholder="Standoff 2 ID (e.g., 123456789)" style="margin-bottom: 0;">
-                </div>
-            `;
+        for(let i=1;i<=4;i++) {
+            playersHtml += `<div style="margin-bottom:16px;padding:12px;background:rgba(255,215,0,0.05);border-radius:12px;"><div style="font-size:0.75rem;color:var(--neon-yellow);margin-bottom:8px;">Player ${i}</div><input type="text" id="pDisc_${i}" placeholder="Discord username" style="margin-bottom:8px;"><input type="text" id="pSo2_${i}" placeholder="Standoff 2 ID"></div>`;
         }
-        
-        modal.innerHTML = `
-            <div class="modal-content" style="max-width: 500px; max-height: 85vh; overflow-y: auto;">
-                <span class="modal-close" onclick="this.closest('.modal').remove()">&times;</span>
-                <h2 style="font-size: 1.3rem;">Team Registration - ${escapeHtml(tournament.name)}</h2>
-                <div style="margin-bottom: 16px; padding: 8px; background: rgba(225,29,72,0.1); border-radius: 8px; font-size: 0.75rem; color: var(--accent-red);">
-                    ⚠️ Captain is responsible for the validity of all team members' data.
-                </div>
-                
-                <div style="margin-bottom: 20px; padding: 12px; background: rgba(16,185,129,0.1); border-radius: 12px;">
-                    <div style="font-size: 0.85rem; font-weight: 600; margin-bottom: 8px;">👑 CAPTAIN (YOU)</div>
-                    <input type="text" id="captainDiscord" placeholder="Your Discord username" style="margin-bottom: 8px;">
-                    <input type="text" id="captainSo2Id" placeholder="Your Standoff 2 ID" style="margin-bottom: 0;">
-                </div>
-                
-                <div style="margin-bottom: 20px;">
-                    <div style="font-size: 0.85rem; font-weight: 600; margin-bottom: 8px;">👥 TEAM MEMBERS</div>
-                    ${playersHtml}
-                </div>
-                
-                <div style="margin-bottom: 16px;">
-                    <input type="text" id="teamName" placeholder="Team name (e.g., HEJTERI Gaming)" style="margin-bottom: 8px;">
-                </div>
-                
-                <button onclick="submitTeamRegistration(${tournamentId})" style="background: var(--gradient-red); width: 100%; padding: 14px; border: none; border-radius: 40px; color: white; font-weight: 600; cursor: pointer;">
-                    Register Team
-                </button>
-            </div>
-        `;
-        
+        modal.innerHTML = `<div class="modal-content" style="max-width:500px;max-height:85vh;overflow-y:auto;"><span class="modal-close" onclick="this.closest('.modal').remove()">&times;</span><h2>Register Team - ${escapeHtml(t.name)}</h2><div style="margin-bottom:16px;padding:12px;background:rgba(225,29,72,0.1);border-radius:12px;font-size:0.75rem;color:var(--accent-red);">⚠️ Captain responsible for all data</div><div style="margin-bottom:20px;padding:16px;background:rgba(255,215,0,0.1);border-radius:12px;"><div style="font-weight:600;margin-bottom:8px;">👑 CAPTAIN (YOU)</div><input type="text" id="captainDisc" placeholder="Discord username" style="margin-bottom:8px;"><input type="text" id="captainSo2" placeholder="Standoff 2 ID"></div><div style="margin-bottom:20px;"><div style="font-weight:600;margin-bottom:12px;">👥 TEAM MEMBERS</div>${playersHtml}</div><input type="text" id="teamName" placeholder="Team name"><button onclick="submitTeamReg(${id})" style="margin-top:20px;width:100%;padding:14px;background:var(--neon-yellow);border:none;border-radius:8px;color:var(--standoff-bg);font-weight:700;cursor:pointer;">REGISTER TEAM</button></div>`;
         document.body.appendChild(modal);
     }
 
-    window.submitTeamRegistration = async function(tournamentId) {
+    window.submitTeamReg = function(id) {
         const user = auth.currentUser;
-        if (!user) {
-            alert('You are not logged in!');
-            return;
-        }
-        
-        const captainDiscord = document.getElementById('captainDiscord')?.value.trim();
-        const captainSo2Id = document.getElementById('captainSo2Id')?.value.trim();
+        if(!user) { showToast('Not logged in!', true); return; }
+        const captainDisc = document.getElementById('captainDisc')?.value.trim();
+        const captainSo2 = document.getElementById('captainSo2')?.value.trim();
         const teamName = document.getElementById('teamName')?.value.trim();
-        
-        if (!captainDiscord || !captainSo2Id) {
-            alert('Please enter your Discord username and Standoff 2 ID.');
-            return;
+        if(!captainDisc || !captainSo2 || !teamName) {
+            showToast('Fill captain and team name!', true); return;
         }
-        
-        if (!teamName) {
-            alert('Please enter a team name.');
-            return;
-        }
-        
         const players = [];
-        for (let i = 1; i <= 4; i++) {
-            const discord = document.getElementById(`playerDiscord_${i}`)?.value.trim();
-            const so2Id = document.getElementById(`playerSo2Id_${i}`)?.value.trim();
-            
-            if (!discord && !so2Id) continue;
-            
-            if (!discord || !so2Id) {
-                alert(`Player ${i}: Please enter both Discord username and Standoff 2 ID, or leave both fields empty.`);
-                return;
+        for(let i=1;i<=4;i++) {
+            const disc = document.getElementById(`pDisc_${i}`)?.value.trim();
+            const so2 = document.getElementById(`pSo2_${i}`)?.value.trim();
+            if(disc || so2) {
+                if(!disc || !so2) { showToast(`Player ${i}: fill both fields!`, true); return; }
+                players.push({ discord: disc, so2Id: so2, userId: null });
             }
-            
-            players.push({
-                discord: discord,
-                so2Id: so2Id,
-                userId: null
-            });
         }
+        const allIds = [captainSo2, ...players.map(p=>p.so2Id)];
+        const allDiscs = [captainDisc, ...players.map(p=>p.discord)];
+        if(new Set(allIds).size !== allIds.length) { showToast('Duplicate Standoff 2 IDs!', true); return; }
+        if(new Set(allDiscs.map(d=>d.toLowerCase())).size !== allDiscs.length) { showToast('Duplicate Discord usernames!', true); return; }
         
-        const allSo2Ids = [captainSo2Id, ...players.map(p => p.so2Id)];
-        const allDiscords = [captainDiscord, ...players.map(p => p.discord)];
+        const idx = tournaments.findIndex(t => t.id === id);
+        if(idx === -1) return;
+        const t = tournaments[idx];
+        if(t.registeredTeams.length >= t.slots) { showToast('Tournament full!', true); return; }
         
-        if (new Set(allSo2Ids).size !== allSo2Ids.length) {
-            alert('Error: Two or more members have the same Standoff 2 ID!');
-            return;
-        }
-        
-        if (new Set(allDiscords.map(d => d.toLowerCase())).size !== allDiscords.length) {
-            alert('Error: Two or more members have the same Discord username!');
-            return;
-        }
-        
-        const tournamentIndex = tournaments.findIndex(t => t.id === tournamentId);
-        if (tournamentIndex === -1) {
-            alert('Tournament does not exist.');
-            return;
-        }
-        
-        const tournament = tournaments[tournamentIndex];
-        
-        if (tournament.registeredTeams && tournament.registeredTeams.length >= tournament.slots) {
-            alert('Tournament is already full!');
-            document.getElementById('teamRegistrationModal')?.remove();
-            renderTournaments();
-            return;
-        }
-        
-        const teamRegistration = {
-            captainId: user.uid,
-            captainEmail: user.email,
-            captainDiscord: captainDiscord,
-            captainSo2Id: captainSo2Id,
-            teamName: teamName,
-            players: players,
-            registeredAt: new Date().toISOString(),
-            status: 'approved'
-        };
-        
-        if (!tournament.registeredTeams) tournament.registeredTeams = [];
-        tournament.registeredTeams.push(teamRegistration);
-        
+        t.registeredTeams.push({
+            captainId: user.uid, captainEmail: user.email, captainDiscord: captainDisc,
+            captainSo2Id: captainSo2, teamName, players, registeredAt: new Date().toISOString()
+        });
         saveTournaments();
-        
-        try {
-            await db.collection('tournamentRegistrations').doc(`${tournamentId}_${user.uid}`).set(teamRegistration);
-        } catch(e) { console.log('Firestore save error:', e); }
-        
-        alert(`Team "${teamName}" has been successfully registered!`);
-        document.getElementById('teamRegistrationModal')?.remove();
         renderTournaments();
+        showToast(`Team ${teamName} registered!`);
+        document.getElementById('teamRegistrationModal')?.remove();
     };
 
-    // ============ RENDER TOURNAMENTS ============
     function renderTournaments() {
         const grid = document.getElementById('tournamentsGrid');
-        if (!grid) return;
+        if(!grid) return;
+        const adminActive = document.getElementById('adminPanel')?.classList.contains('active');
+        const user = auth.currentUser;
         
-        const adminActive = document.getElementById('adminPanel') ? document.getElementById('adminPanel').classList.contains('active') : false;
-        const isLoggedIn = auth.currentUser !== null;
-        const currentUser = auth.currentUser;
-        
-        if (tournaments.length === 0) {
-            grid.innerHTML = '<div class="empty-state">No active tournaments scheduled. Check back later.</div>';
+        if(!tournaments.length) {
+            grid.innerHTML = '<div class="empty-state">No tournaments scheduled.</div>';
             return;
         }
         
         grid.innerHTML = tournaments.map(t => {
-            const registeredCount = t.registeredTeams?.length || 0;
-            const isFull = registeredCount >= t.slots;
-            const userAlreadyCaptain = currentUser && t.registeredTeams?.some(team => team.captainId === currentUser.uid);
-            const userIsMember = currentUser && t.registeredTeams?.some(team => team.players.some(p => p.userId === currentUser.uid));
-            
+            const regCount = t.registeredTeams?.length || 0;
+            const isFull = regCount >= t.slots;
+            const fill = (regCount / t.slots) * 100;
+            const userCaptain = user && t.registeredTeams?.some(team => team.captainId === user.uid);
             return `
                 <div class="tournament-card">
                     <div class="tournament-header">
@@ -1416,26 +1368,22 @@
                     </div>
                     <div class="tournament-body">
                         <div class="tournament-info">
-                            <span class="info-chip">🏆 Prize: ${escapeHtml(t.prize)}</span>
-                            <span class="info-chip">👥 Registered: ${registeredCount}/${t.slots}</span>
+                            <span class="info-chip">🏆 ${escapeHtml(t.prize)}</span>
+                            <span class="info-chip">👥 ${regCount}/${t.slots}</span>
                         </div>
                         ${t.details ? `<div class="tournament-prize">${escapeHtml(t.details)}</div>` : ''}
-                        <div class="tournament-status">${isFull ? '🔴 Full' : '🟢 Registration Open'}</div>
-                        
+                        <div class="tournament-status ${isFull ? 'full' : 'open'}">${isFull ? '🔴 FULL' : '🟢 OPEN'}</div>
+                        <div class="progress-bar"><div class="progress-fill" style="width:${fill}%"></div></div>
                         <div class="tournament-actions">
                             ${adminActive ? `
-                                <button class="edit-btn" onclick="editTournament(${t.id})">✏️ Edit</button>
-                                <button class="delete-btn" onclick="deleteTournament(${t.id})">🗑️ Delete</button>
-                                <button class="view-teams-btn" onclick="viewRegisteredTeams(${t.id})">📋 Teams (${registeredCount})</button>
+                                <button class="edit-btn" onclick="editTournament(${t.id})">✏️ EDIT</button>
+                                <button class="delete-btn" onclick="deleteTournament(${t.id})">🗑️ DELETE</button>
+                                <button class="view-teams-btn" onclick="viewRegisteredTeams(${t.id})">📋 TEAMS</button>
                             ` : ''}
-                            
-                            ${!adminActive && isLoggedIn && !isFull && !userAlreadyCaptain && !userIsMember ? `
-                                <button class="register-team-btn" onclick="openTeamRegistrationModal(${t.id})">➕ Register Team</button>
+                            ${!adminActive && user && !isFull && !userCaptain ? `
+                                <button class="register-team-btn" onclick="openTeamRegistrationModal(${t.id})">➕ REGISTER TEAM</button>
                             ` : ''}
-                            
-                            ${!adminActive && userAlreadyCaptain ? `
-                                <span style="font-size: 0.7rem; color: var(--accent-green);">✅ Your team is registered</span>
-                            ` : ''}
+                            ${!adminActive && userCaptain ? `<span style="font-size:0.7rem;color:var(--neon-yellow);">✅ REGISTERED</span>` : ''}
                         </div>
                     </div>
                 </div>
@@ -1443,235 +1391,103 @@
         }).join('');
     }
 
-    // ============ MODAL FUNCTIONS ============
-    window.openModal = function(modalId) {
-        const modal = document.getElementById(modalId);
-        if (modal) modal.classList.add('active');
+    window.openModal = (id) => document.getElementById(id)?.classList.add('active');
+    window.closeModal = (id) => {
+        const modal = document.getElementById(id);
+        if(modal) modal.classList.remove('active');
     };
-
-    window.closeModal = function(modalId) {
-        const modal = document.getElementById(modalId);
-        if (modal) modal.classList.remove('active');
-        const loginError = document.getElementById('loginError');
-        const registerError = document.getElementById('registerError');
-        const registerSuccess = document.getElementById('registerSuccess');
-        if (loginError) loginError.innerText = '';
-        if (registerError) registerError.innerText = '';
-        if (registerSuccess) registerSuccess.innerText = '';
-    };
-
-    window.switchToRegister = function() {
-        closeModal('loginModal');
-        openModal('registerModal');
-    };
-
-    window.switchToLogin = function() {
-        closeModal('registerModal');
-        openModal('loginModal');
-    };
-
-    // ============ AUTH FUNCTIONS ============
-    window.login = function() {
+    window.switchToRegister = () => { closeModal('loginModal'); openModal('registerModal'); };
+    window.switchToLogin = () => { closeModal('registerModal'); openModal('loginModal'); };
+    
+    window.login = () => {
         const email = document.getElementById('loginEmail').value;
-        const password = document.getElementById('loginPassword').value;
-        const errorDiv = document.getElementById('loginError');
-        
-        if (errorDiv) errorDiv.innerText = '';
-        
-        if (!email || !password) {
-            if (errorDiv) errorDiv.innerText = 'Enter email and password';
-            return;
-        }
-        
-        auth.signInWithEmailAndPassword(email, password)
-            .then((userCredential) => {
-                closeModal('loginModal');
-                document.getElementById('loginEmail').value = '';
-                document.getElementById('loginPassword').value = '';
-            })
-            .catch((error) => {
-                if (errorDiv) {
-                    if (error.code === 'auth/user-not-found') {
-                        errorDiv.innerText = 'User not found';
-                    } else if (error.code === 'auth/wrong-password') {
-                        errorDiv.innerText = 'Wrong password';
-                    } else if (error.code === 'auth/invalid-email') {
-                        errorDiv.innerText = 'Invalid email';
-                    } else {
-                        errorDiv.innerText = 'Error: ' + error.message;
-                    }
-                }
-            });
+        const pwd = document.getElementById('loginPassword').value;
+        const errDiv = document.getElementById('loginError');
+        if(!email || !pwd) { errDiv.innerText = 'Fill all fields'; return; }
+        auth.signInWithEmailAndPassword(email, pwd).then(() => {
+            closeModal('loginModal');
+            showToast('Logged in!');
+        }).catch(e => { errDiv.innerText = e.code === 'auth/user-not-found' ? 'User not found' : 'Wrong credentials'; });
     };
-
-    window.register = function() {
-        const username = document.getElementById('registerUsername').value;
+    
+    window.register = () => {
+        const user = document.getElementById('registerUsername').value;
         const email = document.getElementById('registerEmail').value;
-        const password = document.getElementById('registerPassword').value;
-        const errorDiv = document.getElementById('registerError');
-        const successDiv = document.getElementById('registerSuccess');
-        
-        if (errorDiv) errorDiv.innerText = '';
-        if (successDiv) successDiv.innerText = '';
-        
-        if (!username || !email || !password) {
-            if (errorDiv) errorDiv.innerText = 'Fill all fields';
-            return;
-        }
-        
-        if (password.length < 6) {
-            if (errorDiv) errorDiv.innerText = 'Password must be at least 6 characters';
-            return;
-        }
-        
-        auth.createUserWithEmailAndPassword(email, password)
-            .then((userCredential) => {
-                const user = userCredential.user;
-                return db.collection("users").doc(user.uid).set({
-                    username: username,
-                    email: email,
-                    createdAt: new Date()
-                });
-            })
-            .then(() => {
-                if (successDiv) successDiv.innerText = 'Registration successful!';
-                setTimeout(() => {
-                    closeModal('registerModal');
-                    document.getElementById('registerUsername').value = '';
-                    document.getElementById('registerEmail').value = '';
-                    document.getElementById('registerPassword').value = '';
-                    if (successDiv) successDiv.innerText = '';
-                }, 1500);
-            })
-            .catch((error) => {
-                if (errorDiv) {
-                    if (error.code === 'auth/email-already-in-use') {
-                        errorDiv.innerText = 'Email already exists';
-                    } else if (error.code === 'auth/invalid-email') {
-                        errorDiv.innerText = 'Invalid email';
-                    } else {
-                        errorDiv.innerText = 'Error: ' + error.message;
-                    }
-                }
-            });
+        const pwd = document.getElementById('registerPassword').value;
+        const errDiv = document.getElementById('registerError');
+        if(!user || !email || !pwd) { errDiv.innerText = 'Fill all fields'; return; }
+        if(pwd.length < 6) { errDiv.innerText = 'Password min 6 chars'; return; }
+        auth.createUserWithEmailAndPassword(email, pwd).then(cred => {
+            db.collection('users').doc(cred.user.uid).set({ username: user, email, createdAt: new Date() });
+            showToast('Registered!');
+            closeModal('registerModal');
+        }).catch(e => { errDiv.innerText = e.code === 'auth/email-already-in-use' ? 'Email exists' : 'Error'; });
     };
-
-    window.logout = function() {
-        auth.signOut();
-        renderTournaments();
-    };
-
-    // ============ AUTH STATE LISTENER ============
-    auth.onAuthStateChanged((user) => {
-        const unauthDiv = document.getElementById('unauthButtons');
+    
+    window.logout = () => { auth.signOut(); showToast('Logged out'); };
+    
+    auth.onAuthStateChanged(user => {
+        const unauth = document.getElementById('unauthButtons');
         const authDiv = document.getElementById('authButtons');
         const adminPanel = document.getElementById('adminPanel');
-        const adminToggleBtn = document.getElementById('adminToggleBtn');
-        
-        if (user) {
-            if (unauthDiv) unauthDiv.style.display = 'none';
-            if (authDiv) authDiv.style.display = 'flex';
-            const userEmailSpan = document.getElementById('userEmail');
-            if (userEmailSpan) userEmailSpan.innerText = user.email;
-            
-            db.collection("users").doc(user.uid).get().then((doc) => {
-                if (doc.exists && doc.data().username) {
-                    if (userEmailSpan) userEmailSpan.innerText = doc.data().username;
-                }
-            }).catch(err => console.log("Error:", err));
-            
-            // Admin emails - ADD YOUR EMAIL HERE
-            const adminEmails = ['hejterigg@gmail.com', 'admin@hejteri.com'];
-            if (adminToggleBtn) {
-                if (adminEmails.includes(user.email)) {
-                    adminToggleBtn.style.display = 'block';
-                } else {
-                    adminToggleBtn.style.display = 'none';
-                    if (adminPanel) adminPanel.classList.remove('active');
-                }
+        const adminBtn = document.getElementById('adminToggleBtn');
+        const userSpan = document.getElementById('userEmail');
+        if(user) {
+            if(unauth) unauth.style.display = 'none';
+            if(authDiv) authDiv.style.display = 'flex';
+            if(userSpan) userSpan.innerText = user.email;
+            db.collection('users').doc(user.uid).get().then(doc => {
+                if(doc.exists && userSpan) userSpan.innerText = doc.data().username;
+            });
+            const admins = ['hejterigg@gmail.com', 'admin@hejteri.com'];
+            if(adminBtn) {
+                if(admins.includes(user.email)) adminBtn.style.display = 'block';
+                else { adminBtn.style.display = 'none'; if(adminPanel) adminPanel.classList.remove('active'); }
             }
         } else {
-            if (unauthDiv) unauthDiv.style.display = 'flex';
-            if (authDiv) authDiv.style.display = 'none';
-            if (adminPanel) adminPanel.classList.remove('active');
+            if(unauth) unauth.style.display = 'flex';
+            if(authDiv) authDiv.style.display = 'none';
+            if(adminPanel) adminPanel.classList.remove('active');
         }
         renderTournaments();
     });
-
-    // ============ EVENT LISTENERS ============
-    document.addEventListener('DOMContentLoaded', function() {
-        const showLoginBtn = document.getElementById('showLoginBtn');
-        const showRegisterBtn = document.getElementById('showRegisterBtn');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const adminToggleBtn = document.getElementById('adminToggleBtn');
-        const tournamentForm = document.getElementById('tournamentForm');
-        const contactBtn = document.getElementById('contactBtn');
-        const discordBtn = document.getElementById('discordBtn');
-        const instagramBtn = document.getElementById('instagramBtn');
-        const emailBtn = document.getElementById('emailBtn');
-        
-        if (showLoginBtn) showLoginBtn.addEventListener('click', () => openModal('loginModal'));
-        if (showRegisterBtn) showRegisterBtn.addEventListener('click', () => openModal('registerModal'));
-        if (logoutBtn) logoutBtn.addEventListener('click', () => auth.signOut());
-        
-        if (adminToggleBtn) {
-            adminToggleBtn.addEventListener('click', () => {
-                const panel = document.getElementById('adminPanel');
-                if (panel) panel.classList.toggle('active');
-                renderTournaments();
-            });
-        }
-        
-        if (tournamentForm) {
-            tournamentForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const name = document.getElementById('tournamentName').value;
-                const date = document.getElementById('tournamentDate').value;
-                const time = document.getElementById('tournamentTime').value;
-                const prize = document.getElementById('tournamentPrize').value;
-                const details = document.getElementById('tournamentDetails').value;
-                const slots = document.getElementById('tournamentSlots').value;
-                if (name && date && time && prize) {
-                    addTournament(name, date, time, prize, details, slots);
-                    tournamentForm.reset();
-                    alert('Tournament added.');
-                } else {
-                    alert('Please fill required fields.');
-                }
-            });
-        }
-        
-        if (contactBtn) {
-            contactBtn.addEventListener('click', () => {
-                alert('To register a team, click "Register Team" on any tournament.');
-            });
-        }
-        
-        if (discordBtn) {
-            discordBtn.addEventListener('click', () => window.open('https://discord.gg/hejteri', '_blank'));
-        }
-        
-        if (instagramBtn) {
-            instagramBtn.addEventListener('click', () => window.open('https://instagram.com/hejteri_esports', '_blank'));
-        }
-        
-        if (emailBtn) {
-            emailBtn.addEventListener('click', () => {
-                navigator.clipboard.writeText('hejteri@balkan.com');
-                alert('Email copied: hejteri@balkan.com');
-            });
-        }
-        
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('showLoginBtn')?.addEventListener('click', () => openModal('loginModal'));
+        document.getElementById('showRegisterBtn')?.addEventListener('click', () => openModal('registerModal'));
+        document.getElementById('logoutBtn')?.addEventListener('click', () => auth.signOut());
+        document.getElementById('adminToggleBtn')?.addEventListener('click', () => {
+            document.getElementById('adminPanel')?.classList.toggle('active');
+            renderTournaments();
+        });
+        document.getElementById('tournamentForm')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('tournamentName').value;
+            const date = document.getElementById('tournamentDate').value;
+            const time = document.getElementById('tournamentTime').value;
+            const prize = document.getElementById('tournamentPrize').value;
+            const details = document.getElementById('tournamentDetails').value;
+            const slots = document.getElementById('tournamentSlots').value;
+            if(name && date && time && prize) {
+                addTournament(name, date, time, prize, details, slots);
+                e.target.reset();
+            } else showToast('Fill required fields', true);
+        });
+        document.getElementById('contactBtn')?.addEventListener('click', () => showToast('Click Register Team on any tournament'));
+        document.getElementById('discordBtn')?.addEventListener('click', () => window.open('https://discord.gg/hejteri', '_blank'));
+        document.getElementById('instagramBtn')?.addEventListener('click', () => window.open('https://instagram.com/hejteri_esports', '_blank'));
+        document.getElementById('emailBtn')?.addEventListener('click', () => { navigator.clipboard.writeText('hejteri@balkan.com'); showToast('Email copied!'); });
+        document.getElementById('hamburgerBtn')?.addEventListener('click', () => document.getElementById('navLinks')?.classList.toggle('active'));
         document.querySelectorAll('.nav-links a').forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
                 const target = document.querySelector(link.getAttribute('href'));
-                if (target) target.scrollIntoView({ behavior: 'smooth' });
+                if(target) target.scrollIntoView({ behavior: 'smooth' });
+                document.getElementById('navLinks')?.classList.remove('active');
             });
         });
+        loadTournaments();
     });
-
-    loadTournaments();
 </script>
 </body>
 </html>
