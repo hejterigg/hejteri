@@ -707,7 +707,7 @@
             gap: 12px;
             flex-wrap: wrap;
         }
-        .edit-btn, .delete-btn, .register-team-btn, .view-teams-btn, .checkin-btn, .view-bracket-btn, .seed-btn, .start-tournament-btn {
+        .edit-btn, .delete-btn, .register-team-btn, .view-teams-btn, .checkin-btn, .view-bracket-btn, .seed-btn, .start-tournament-btn, .groups-config-btn {
             padding: 8px 16px;
             border-radius: 8px;
             font-size: 0.7rem;
@@ -783,6 +783,70 @@
         .start-tournament-btn:hover {
             background: rgba(255, 215, 0, 0.4);
             transform: translateY(-2px);
+        }
+        .groups-config-btn {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+            border: 1px solid #3b82f6;
+        }
+        .groups-config-btn:hover {
+            background: rgba(59, 130, 246, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .group-stage-container {
+            margin-top: 20px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 16px;
+            padding: 16px;
+            overflow-x: auto;
+        }
+        .groups-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+        .group-card {
+            background: var(--standoff-card);
+            border: 1px solid var(--neon-yellow);
+            border-radius: 16px;
+            min-width: 280px;
+            flex: 1;
+            overflow: hidden;
+        }
+        .group-header {
+            background: rgba(255, 215, 0, 0.1);
+            padding: 12px;
+            text-align: center;
+            font-weight: bold;
+            color: var(--neon-yellow);
+            border-bottom: 1px solid var(--neon-yellow);
+        }
+        .group-teams {
+            padding: 12px;
+        }
+        .group-team-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            border-bottom: 1px solid rgba(255,215,0,0.1);
+            font-size: 0.8rem;
+        }
+        .group-team-name {
+            font-weight: 500;
+        }
+        .group-team-record {
+            color: var(--neon-yellow);
+        }
+        .qualifier-badge {
+            background: var(--accent-green);
+            color: black;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: bold;
+            margin-left: 8px;
         }
         
         .bracket-container {
@@ -1070,6 +1134,62 @@
             transform: scale(1.02);
             box-shadow: 0 0 15px var(--neon-yellow-glow);
         }
+        
+        .groups-config-panel {
+            margin-top: 32px;
+            padding-top: 32px;
+            border-top: 1px solid rgba(255,215,0,0.2);
+        }
+        .groups-config-panel h3 {
+            margin-bottom: 16px;
+            font-size: 1rem;
+            color: var(--neon-yellow);
+        }
+        .groups-input-group {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .groups-input-group input {
+            flex: 1;
+            min-width: 150px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--standoff-border);
+            border-radius: 8px;
+            padding: 12px;
+            color: white;
+        }
+        .groups-input-group button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .groups-input-group button:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+        #tournamentGroupSelect {
+            width: 100%;
+            padding: 12px;
+            background: #1a1a1f;
+            border: 1px solid var(--neon-yellow);
+            border-radius: 8px;
+            color: white;
+            margin-bottom: 12px;
+        }
+        .group-preview {
+            margin-top: 20px;
+            padding: 16px;
+            background: rgba(255,215,0,0.05);
+            border-radius: 12px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
 
         .rules-grid {
             display: grid;
@@ -1218,6 +1338,7 @@
             .team-name { font-size: 0.75rem; }
             .notification-panel { width: 300px; left: 10px; bottom: 90px; }
             .notification-bell { left: 10px; bottom: 20px; width: 45px; height: 45px; }
+            .groups-input-group { flex-direction: column; }
         }
         @media (max-width: 480px) {
             .rules-grid { grid-template-columns: 1fr; }
@@ -1379,6 +1500,20 @@
                     <input type="number" id="tournamentSlots" placeholder="Team slots" value="16">
                     <button type="submit" class="full-width">➕ ADD TOURNAMENT</button>
                 </form>
+                
+                <!-- NOVA GROUP STAGE ADMIN SEKCIJA -->
+                <div class="groups-config-panel">
+                    <h3>📋 CREATE GROUP STAGE (Admin only)</h3>
+                    <div class="groups-input-group">
+                        <input type="number" id="teamsPerGroup" placeholder="Teams per group (e.g. 4)" min="2" max="8" value="4">
+                        <input type="number" id="qualifiersPerGroup" placeholder="Qualifiers from each group" min="1" max="4" value="2">
+                        <button type="button" id="applyGroupsToTournamentBtn">🎲 GENERATE GROUPS</button>
+                    </div>
+                    <select id="tournamentGroupSelect">
+                        <option value="">-- Select Tournament --</option>
+                    </select>
+                    <div id="groupPreview" class="group-preview"></div>
+                </div>
             </div>
 
             <div id="tournamentsGrid" class="tournaments-grid"></div>
@@ -1516,103 +1651,6 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // ==================== DISCORD LOGIN FUNKCIJA ====================
-    const discordProvider = new firebase.auth.OAuthProvider('oidc.discord-login');
-    discordProvider.addScope('identify');
-    discordProvider.addScope('email');
-
-    window.signInWithDiscord = async function() {
-        try {
-            const result = await auth.signInWithPopup(discordProvider);
-            const user = result.user;
-            
-            let discordUsername = 'Discord User';
-            
-            if (user.providerData && user.providerData.length > 0) {
-                const discordData = user.providerData.find(p => p.providerId === 'oidc.discord-login');
-                if (discordData && discordData.displayName && discordData.displayName !== 'Discord User') {
-                    discordUsername = discordData.displayName;
-                }
-            }
-            
-            if ((discordUsername === 'Discord User' || !discordUsername) && user.email) {
-                discordUsername = user.email.split('@')[0];
-            }
-            
-            try {
-                const credential = firebase.auth.OAuthProvider.credentialFromResult(result);
-                if (credential && credential.accessToken) {
-                    const response = await fetch('https://discord.com/api/users/@me', {
-                        headers: { 'Authorization': `Bearer ${credential.accessToken}` }
-                    });
-                    if (response.ok) {
-                        const discordData = await response.json();
-                        if (discordData.username) {
-                            discordUsername = discordData.username;
-                        }
-                        if (discordData.global_name && discordData.global_name !== discordUsername) {
-                            discordUsername = discordData.global_name;
-                        }
-                    }
-                }
-            } catch (e) {
-                console.log('Could not fetch from Discord API:', e);
-            }
-            
-            if (discordUsername === 'Discord User' && user.displayName && user.displayName !== 'Discord User') {
-                discordUsername = user.displayName;
-            }
-            
-            if (discordUsername === 'Discord User' && user.uid) {
-                discordUsername = 'player_' + user.uid.slice(-6);
-            }
-            
-            await db.collection('users').doc(user.uid).set({
-                uid: user.uid,
-                email: user.email,
-                discordUsername: discordUsername,
-                discordId: user.uid,
-                lastLogin: new Date().toISOString(),
-                lastLoginMethod: 'discord'
-            }, { merge: true });
-            
-            if (discordUsername && discordUsername !== 'Discord User') {
-                try {
-                    await user.updateProfile({ displayName: discordUsername });
-                } catch(e) { console.log('Could not update profile:', e); }
-            }
-            
-            showToast(`Welcome ${discordUsername}!`);
-            addNotification('Discord Login', `Logged in as ${discordUsername}`, 'info');
-            
-            closeModal('loginModal');
-            closeModal('registerModal');
-            
-            const userSpan = document.getElementById('userEmail');
-            if (userSpan) userSpan.innerText = discordUsername;
-            
-            await loadTournaments();
-            
-        } catch (error) {
-            console.error('Discord login error:', error);
-            if (error.code === 'auth/unauthorized-domain') {
-                showToast('Domain not authorized. Add it to Firebase console.', true);
-            } else if (error.code === 'auth/popup-closed-by-user') {
-                showToast('Login cancelled - popup was closed', true);
-            } else if (error.code === 'auth/operation-not-allowed') {
-                showToast('Discord login not enabled in Firebase console', true);
-            } else {
-                showToast('Discord login failed: ' + (error.message || error.code || 'Unknown error'), true);
-            }
-        }
-    };
-
-    // ==================== GLOBAL VARIABLES ====================
-    let tournaments = [];
-    let countdownInterval = null;
-    let currentUserIsAdmin = false;
-    let currentMatchContext = null;
-    
     // ==================== NOTIFICATION SYSTEM ====================
     let notifications = [];
     let browserNotificationPermission = false;
@@ -1730,110 +1768,6 @@
         }
     }
     
-    async function checkAndAddTournamentNotifications() {
-        for(const t of tournaments) {
-            const tournamentDateTime = getTournamentDateTime(t);
-            if(!tournamentDateTime) continue;
-            
-            const now = new Date();
-            const hourBefore = new Date(tournamentDateTime.getTime() - 60 * 60 * 1000);
-            const dayBefore = new Date(tournamentDateTime.getTime() - 24 * 60 * 60 * 1000);
-            
-            if(now >= hourBefore && now < tournamentDateTime && !t._checkinNotified) {
-                t._checkinNotified = true;
-                addNotification(`🔔 Check-in Open: ${t.name}`, `Check-in is now available for your team! Don't miss it.`, 'urgent');
-            }
-            
-            if(now >= dayBefore && now < dayBefore.getTime() + 60000 && !t._dayNotified) {
-                t._dayNotified = true;
-                addNotification(`⏰ ${t.name} starts tomorrow!`, `Get your team ready. Check-in opens 1 hour before start.`, 'info');
-            }
-        }
-    }
-    
-    // ==================== MOBILE BRACKET OPTIMIZATION ====================
-    function initBracketTouchScroll() {
-        const containers = document.querySelectorAll('.bracket-container');
-        containers.forEach(container => {
-            let isDown = false;
-            let startX;
-            let scrollLeft;
-            
-            container.addEventListener('mousedown', (e) => {
-                isDown = true;
-                container.style.cursor = 'grabbing';
-                startX = e.pageX - container.offsetLeft;
-                scrollLeft = container.scrollLeft;
-            });
-            
-            container.addEventListener('mouseleave', () => {
-                isDown = false;
-                container.style.cursor = 'grab';
-            });
-            
-            container.addEventListener('mouseup', () => {
-                isDown = false;
-                container.style.cursor = 'grab';
-            });
-            
-            container.addEventListener('mousemove', (e) => {
-                if(!isDown) return;
-                e.preventDefault();
-                const x = e.pageX - container.offsetLeft;
-                const walk = (x - startX) * 1.5;
-                container.scrollLeft = scrollLeft - walk;
-            });
-            
-            container.addEventListener('touchstart', (e) => {
-                isDown = true;
-                startX = e.touches[0].pageX - container.offsetLeft;
-                scrollLeft = container.scrollLeft;
-            });
-            
-            container.addEventListener('touchend', () => {
-                isDown = false;
-            });
-            
-            container.addEventListener('touchmove', (e) => {
-                if(!isDown) return;
-                const x = e.touches[0].pageX - container.offsetLeft;
-                const walk = (x - startX) * 1.5;
-                container.scrollLeft = scrollLeft - walk;
-            });
-        });
-    }
-    
-    function addScrollHint(container) {
-        if(!container) return;
-        const hasScroll = container.scrollWidth > container.clientWidth;
-        let hint = container.parentElement.querySelector('.scroll-hint');
-        
-        if(hasScroll && !hint) {
-            hint = document.createElement('div');
-            hint.className = 'scroll-hint';
-            hint.innerHTML = '<i class="fas fa-arrow-right"></i> Scroll →';
-            container.parentElement.style.position = 'relative';
-            container.parentElement.appendChild(hint);
-            
-            container.addEventListener('scroll', () => {
-                if(container.scrollLeft + container.clientWidth >= container.scrollWidth - 20) {
-                    if(hint) hint.style.display = 'none';
-                } else {
-                    if(hint) hint.style.display = 'flex';
-                }
-            });
-            
-            setTimeout(() => {
-                if(hint) hint.style.opacity = '0.8';
-                setTimeout(() => {
-                    if(hint && hint.parentElement) hint.remove();
-                }, 5000);
-            }, 3000);
-        } else if(!hasScroll && hint) {
-            hint.remove();
-        }
-    }
-
     // ==================== HELPER FUNCTIONS ====================
     function escapeHtml(str) {
         if (!str) return '';
@@ -1858,11 +1792,6 @@
         if (!dateStr) return 'TBD';
         const date = new Date(dateStr);
         return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-    }
-
-    function formatTimeForDisplay(timeStr) {
-        if (!timeStr) return 'TBD';
-        return timeStr;
     }
 
     function getTournamentDateTime(tournament) {
@@ -1902,7 +1831,7 @@
         }
         
         if(nameEl) nameEl.innerText = `Next: ${escapeHtml(next.tournament.name)}`;
-        if(countdownInterval) clearInterval(countdownInterval);
+        if(window.countdownInterval) clearInterval(window.countdownInterval);
         
         function update() {
             const diff = next.date - new Date();
@@ -1913,11 +1842,12 @@
             const secs = Math.floor((diff % 60000) / 1000);
             if(daysEl) daysEl.innerText = days < 10 ? '0'+days : days;
             if(hoursEl) hoursEl.innerText = hours < 10 ? '0'+hours : hours;
-            if(minutesEl) minutesEl.innerText = mins < 10 ? '0'+mins : mins;
-            if(secondsEl) secondsEl.innerText = secs < 10 ? '0'+secs : secs;
+            if(minsEl) minsEl.innerText = mins < 10 ? '0'+mins : mins;
+            if(secsEl) secsEl.innerText = secs < 10 ? '0'+secs : secs;
         }
+        const minsEl = minutesEl, secsEl = secondsEl;
         update();
-        countdownInterval = setInterval(update, 1000);
+        window.countdownInterval = setInterval(update, 1000);
     }
 
     function canCheckIn(tournament) {
@@ -1928,21 +1858,12 @@
         return now >= hourBefore && now < tournamentDateTime;
     }
 
-    function canViewBracket(tournament) {
-        const tournamentDateTime = getTournamentDateTime(tournament);
-        if(!tournamentDateTime) return false;
-        const now = new Date();
-        const checkInStart = new Date(tournamentDateTime.getTime() - 60 * 60 * 1000);
-        return now >= checkInStart;
-    }
-
     // ==================== BRACKET MANAGER CLASS ====================
     class BracketManager {
         constructor(tournamentId, tournamentData) {
             this.tournamentId = tournamentId;
             this.tournamentData = tournamentData;
             this.matches = tournamentData.bracket?.matches || [];
-            this.currentRound = tournamentData.bracket?.currentRound || 1;
         }
 
         getNextPowerOfTwo(n) {
@@ -2175,93 +2096,95 @@
         
         return html;
     }
-
-    // ==================== SCORE MODAL FUNCTIONS ====================
-    function addScoreModal() {
-        if (document.getElementById('scoreModal')) return;
+    
+    // ==================== GROUP STAGE FUNKCIJE (NOVO) ====================
+    async function generateGroupStage(tournamentId, teamsPerGroup, qualifiersPerGroup) {
+        const tournament = tournaments.find(t => t.id === tournamentId);
+        if(!tournament) { showToast("Tournament not found", true); return false; }
+        const teams = tournament.registeredTeams || [];
+        if(teams.length < teamsPerGroup) { showToast(`Need at least ${teamsPerGroup} teams to form groups`, true); return false; }
         
-        const modal = document.createElement('div');
-        modal.id = 'scoreModal';
-        modal.className = 'modal';
-        modal.style.display = 'none';
-        modal.innerHTML = `
-            <div class="score-modal-content">
-                <span class="modal-close" onclick="closeScoreModal()">&times;</span>
-                <h2>Submit Match Score</h2>
-                <div class="score-input-group">
-                    <label>Team 1 Score</label>
-                    <input type="number" id="team1Score" min="0" max="16" value="0">
-                </div>
-                <div class="score-input-group">
-                    <label>Team 2 Score</label>
-                    <input type="number" id="team2Score" min="0" max="16" value="0">
-                </div>
-                <button onclick="submitScore()" style="width:100%; padding:12px; background: var(--neon-yellow); border: none; border-radius: 8px; font-weight: 700; cursor: pointer;">Submit Score</button>
-            </div>
-        `;
-        document.body.appendChild(modal);
-    }
-
-    window.openScoreModal = function(tournamentId, matchId) {
-        currentMatchContext = { tournamentId, matchId };
-        const modal = document.getElementById('scoreModal');
-        if (modal) modal.style.display = 'flex';
-    };
-
-    function closeScoreModal() {
-        const modal = document.getElementById('scoreModal');
-        if (modal) modal.style.display = 'none';
-        currentMatchContext = null;
-    }
-
-    window.submitScore = async function() {
-        if (!currentMatchContext) return;
+        const shuffled = [...teams];
+        for(let i=shuffled.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]];}
         
-        const score1 = parseInt(document.getElementById('team1Score')?.value) || 0;
-        const score2 = parseInt(document.getElementById('team2Score')?.value) || 0;
+        const groups = [];
+        const numGroups = Math.ceil(teams.length / teamsPerGroup);
+        for(let g=0;g<numGroups;g++){ groups.push({ groupName: String.fromCharCode(65+g), teams: [], matches: [], standings: [] }); }
         
-        if (score1 === score2) {
-            showToast('Scores cannot be equal!', true);
-            return;
+        let teamIdx=0;
+        for(let g=0;g<numGroups;g++){
+            for(let t=0;t<teamsPerGroup;t++){
+                if(teamIdx<teams.length) groups[g].teams.push(shuffled[teamIdx++]);
+                else break;
+            }
         }
         
-        const tournament = tournaments.find(t => t.id === currentMatchContext.tournamentId);
-        if (!tournament) return;
+        for(let g of groups){
+            const matches = [];
+            for(let i=0;i<g.teams.length;i++){
+                for(let j=i+1;j<g.teams.length;j++){
+                    matches.push({ team1: g.teams[i], team2: g.teams[j], score1: null, score2: null, completed: false, winner: null });
+                }
+            }
+            g.matches = matches;
+            g.standings = g.teams.map(t => ({ team: t, wins: 0, losses: 0, points: 0 }));
+        }
         
-        const match = tournament.bracket?.matches.find(m => m.id === currentMatchContext.matchId);
-        if (!match) return;
+        const allQualifiers = [];
+        for(let g of groups){
+            const sorted = [...g.standings].sort((a,b)=>b.points - a.points);
+            const qualifiersCount = Math.min(qualifiersPerGroup, g.teams.length);
+            for(let i=0;i<qualifiersCount;i++) allQualifiers.push(sorted[i].team);
+        }
         
-        const winner = score1 > score2 ? match.team1 : match.team2;
-        
-        const bracketManager = new BracketManager(currentMatchContext.tournamentId, tournament);
-        await bracketManager.updateMatchResult(currentMatchContext.matchId, score1, score2, winner);
-        
+        const groupStageData = { groups, qualifiersPerGroup, teamsPerGroup, qualifiers: allQualifiers };
+        await db.collection('tournaments').doc(tournamentId).update({ groupStage: groupStageData });
+        showToast(`Group stage created! ${allQualifiers.length} teams advance.`);
         await loadTournaments();
-        closeScoreModal();
-        showToast('Score submitted successfully!');
-        addNotification('Match Result Updated', `${winner.teamName} won their match!`, 'match');
-    };
-
-    window.forceWin = async function(tournamentId, matchId) {
-        if (!confirm('Are you sure? This will force a win for the team with players present.')) return;
+        return true;
+    }
+    
+    function renderGroupStage(tournament){
+        if(!tournament.groupStage) return '';
+        const groups = tournament.groupStage.groups;
+        let html = `<div class="group-stage-container"><div class="groups-grid">`;
+        for(let g of groups){
+            html += `<div class="group-card"><div class="group-header">GROUP ${g.groupName}</div><div class="group-teams">`;
+            for(let team of g.teams){
+                const standing = g.standings.find(s=>s.team.teamName===team.teamName);
+                const points = standing ? standing.points : 0;
+                const isQualifier = tournament.groupStage.qualifiers.some(q=>q.teamName===team.teamName);
+                html += `<div class="group-team-row"><span class="group-team-name">${escapeHtml(team.teamName)}</span><span class="group-team-record">${points} pts${isQualifier?' <span class="qualifier-badge">✓ Qualifies</span>':''}</span></div>`;
+            }
+            html += `</div></div>`;
+        }
+        html += `</div><div style="margin-top:16px;padding:12px;background:rgba(255,215,0,0.1);border-radius:12px;"><strong>🏆 Advancing to Playoffs:</strong> ${tournament.groupStage.qualifiers.map(t=>escapeHtml(t.teamName)).join(', ')}</div></div>`;
+        return html;
+    }
+    
+    async function seedFromGroupStage(tournamentId) {
+        const tournament = tournaments.find(t=>t.id===tournamentId);
+        if(!tournament?.groupStage?.qualifiers) { showToast("No group stage qualifiers found", true); return false; }
+        const qualifiers = tournament.groupStage.qualifiers;
+        if(qualifiers.length < 2) { showToast("Need at least 2 qualifiers for bracket", true); return false; }
         
-        const tournament = tournaments.find(t => t.id === tournamentId);
-        if (!tournament) return;
-        
-        const match = tournament.bracket?.matches.find(m => m.id === matchId);
-        if (!match) return;
-        
-        const winner = match.team1;
+        const shuffled = [...qualifiers];
+        for(let i=shuffled.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]];}
         
         const bracketManager = new BracketManager(tournamentId, tournament);
-        await bracketManager.updateMatchResult(matchId, 2, 0, winner);
+        const bracket = bracketManager.generateBracket(shuffled);
         
+        await db.collection('tournaments').doc(tournamentId).update({ bracket: bracket, status: 'ready' });
+        showToast("Playoff bracket created from group stage qualifiers!");
         await loadTournaments();
-        showToast('Force win applied!');
-        addNotification('Force Win Applied', `Admin forced win for ${winner.teamName}`, 'urgent');
-    };
-
+        return true;
+    }
+    
     // ==================== TOURNAMENT FUNCTIONS ====================
+    let tournaments = [];
+    let currentUserIsAdmin = false;
+    let currentMatchContext = null;
+    
     async function loadTournaments() {
         try {
             const snapshot = await db.collection('tournaments').orderBy('createdAt', 'desc').get();
@@ -2271,7 +2194,15 @@
             });
             renderTournaments();
             updateCountdown();
-            await checkAndAddTournamentNotifications();
+            
+            // Populate group select dropdown
+            const select = document.getElementById('tournamentGroupSelect');
+            if(select){
+                select.innerHTML = '<option value="">-- Select Tournament --</option>';
+                tournaments.forEach(t=>{ 
+                    if(t.registeredTeams?.length) select.innerHTML += `<option value="${t.id}">${escapeHtml(t.name)} (${t.registeredTeams.length} teams)</option>`; 
+                });
+            }
         } catch (error) {
             console.error('Error loading tournaments:', error);
             showToast('Error loading tournaments', true);
@@ -2280,27 +2211,18 @@
 
     async function addTournament(name, date, time, prize, details, slots) {
         if(!currentUserIsAdmin) { showToast('Admin access required!', true); return; }
-        
         const newTournament = {
-            name, date, time, prize, details,
-            slots: parseInt(slots),
-            registeredTeams: [],
-            checkedInTeams: [],
-            status: 'upcoming',
-            seeding: null,
-            bracket: null,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            name, date, time, prize, details, slots: parseInt(slots), registeredTeams: [], checkedInTeams: [],
+            status: 'upcoming', createdAt: firebase.firestore.FieldValue.serverTimestamp()
         };
-        
         await db.collection('tournaments').add(newTournament);
         await loadTournaments();
         showToast('Tournament added!');
-        addNotification('New Tournament Created', `${name} has been added! Register your team now.`, 'info');
+        addNotification('New Tournament Created', `${name} has been added!`, 'info');
     }
 
     async function deleteTournament(id) {
         if(!currentUserIsAdmin) { showToast('Admin access required!', true); return; }
-        
         if(confirm('Delete this tournament?')) {
             await db.collection('tournaments').doc(id).delete();
             await loadTournaments();
@@ -2310,7 +2232,6 @@
 
     async function editTournament(id) {
         if(!currentUserIsAdmin) { showToast('Admin access required!', true); return; }
-        
         const t = tournaments.find(t => t.id === id);
         if(!t) return;
         const newName = prompt('Tournament name:', t.name);
@@ -2321,22 +2242,24 @@
         if(newTime?.trim()) t.time = newTime;
         const newPrize = prompt('Prize pool:', t.prize);
         if(newPrize?.trim()) t.prize = newPrize;
-        
-        await db.collection('tournaments').doc(id).update({
-            name: t.name, date: t.date, time: t.time, prize: t.prize
-        });
+        await db.collection('tournaments').doc(id).update({ name: t.name, date: t.date, time: t.time, prize: t.prize });
         await loadTournaments();
         showToast('Tournament updated');
     }
 
     window.seedTournament = async function(id) {
         if(!currentUserIsAdmin) { showToast('Admin access required!', true); return; }
-        
         const tournamentRef = db.collection('tournaments').doc(id);
         const tournamentDoc = await tournamentRef.get();
         const t = tournamentDoc.data();
-        
         if(!t) return;
+        
+        // Check if group stage exists, if yes use qualifiers
+        if(t.groupStage && t.groupStage.qualifiers && t.groupStage.qualifiers.length >= 2) {
+            await seedFromGroupStage(id);
+            return;
+        }
+        
         if(!t.registeredTeams || t.registeredTeams.length < 2) {
             showToast('Need at least 2 teams to seed!', true);
             return;
@@ -2346,7 +2269,7 @@
         const teamsToSeed = checkedInTeams.length >= 2 ? checkedInTeams : t.registeredTeams;
         
         if(teamsToSeed.length < 2) {
-            showToast('Need at least 2 teams to seed (checked in or registered)!', true);
+            showToast('Need at least 2 teams to seed!', true);
             return;
         }
         
@@ -2359,57 +2282,39 @@
         const bracketManager = new BracketManager(id, t);
         const bracket = bracketManager.generateBracket(shuffled);
         
-        await tournamentRef.update({ 
-            seeding: shuffled.map((team, idx) => ({ ...team, seed: idx + 1 })),
-            bracket: bracket,
-            status: 'ready'
-        });
-        
+        await tournamentRef.update({ seeding: shuffled.map((team, idx) => ({ ...team, seed: idx + 1 })), bracket: bracket, status: 'ready' });
         await loadTournaments();
-        showToast('Tournament seeded successfully! Bracket created.');
+        showToast('Tournament seeded successfully!');
         addNotification('Tournament Seeded', `${t.name} bracket has been created!`, 'info');
     };
 
     window.startTournament = async function(id) {
         if(!currentUserIsAdmin) { showToast('Admin access required!', true); return; }
-        
         const tournamentRef = db.collection('tournaments').doc(id);
         const tournamentDoc = await tournamentRef.get();
         const t = tournamentDoc.data();
-        
         if(!t) return;
         if(!t.bracket || !t.bracket.matches) {
             showToast('Please seed tournament first!', true);
             return;
         }
-        
-        await tournamentRef.update({ 
-            status: 'live', 
-            startedAt: new Date().toISOString() 
-        });
-        
+        await tournamentRef.update({ status: 'live', startedAt: new Date().toISOString() });
         await loadTournaments();
         showToast(`Tournament ${t.name} is now LIVE!`);
-        addNotification(`🔴 TOURNAMENT LIVE!`, `${t.name} has started! Check your matches now!`, 'urgent');
+        addNotification(`🔴 TOURNAMENT LIVE!`, `${t.name} has started!`, 'urgent');
     };
 
     async function checkInTeam(id) {
         const user = auth.currentUser;
         if(!user) { showToast('Login first!', true); return; }
-        
         const tournamentRef = db.collection('tournaments').doc(id);
         const tournamentDoc = await tournamentRef.get();
         const t = tournamentDoc.data();
-        
         if(!t) return;
-        
         const userTeam = t.registeredTeams?.find(team => team.captainId === user.uid);
         if(!userTeam) { showToast('You need to register a team first!', true); return; }
-        
         if(!canCheckIn(t)) { showToast('Check-in opens 1 hour before tournament start!', true); return; }
-        
         if(t.checkedInTeams?.includes(user.uid)) { showToast('Team already checked in!', true); return; }
-        
         const checkedInTeams = [...(t.checkedInTeams || []), user.uid];
         await tournamentRef.update({ checkedInTeams: checkedInTeams });
         await loadTournaments();
@@ -2420,31 +2325,34 @@
     window.toggleBracket = function(id) {
         const t = tournaments.find(t => t.id === id);
         if(!t) return;
-        
         const bracketDiv = document.getElementById(`bracket-${id}`);
         if(bracketDiv) {
             if(bracketDiv.style.display === 'none' || bracketDiv.style.display === '') {
                 bracketDiv.innerHTML = renderBracket(t);
                 bracketDiv.style.display = 'block';
-                setTimeout(() => {
-                    const container = bracketDiv.querySelector('.bracket-container');
-                    if(container) {
-                        initBracketTouchScroll();
-                        addScrollHint(container);
-                    }
-                }, 100);
             } else {
                 bracketDiv.style.display = 'none';
+            }
+        }
+    };
+    
+    window.toggleGroupStage = function(id) {
+        const t = tournaments.find(t => t.id === id);
+        if(!t?.groupStage) return;
+        const groupDiv = document.getElementById(`groupStage-${id}`);
+        if(groupDiv) {
+            if(groupDiv.style.display === 'none' || groupDiv.style.display === '') {
+                groupDiv.innerHTML = renderGroupStage(t);
+                groupDiv.style.display = 'block';
+            } else {
+                groupDiv.style.display = 'none';
             }
         }
     };
 
     window.viewRegisteredTeams = function(id) {
         const t = tournaments.find(t => t.id === id);
-        if(!t?.registeredTeams?.length) {
-            showToast('No teams registered', true);
-            return;
-        }
+        if(!t?.registeredTeams?.length) { showToast('No teams registered', true); return; }
         const existing = document.getElementById('teamsListModal');
         if(existing) existing.remove();
         const modal = document.createElement('div');
@@ -2471,12 +2379,8 @@
         const t = tournaments.find(t => t.id === id);
         if(!t) return;
         if(t.status === 'live') { showToast('Tournament already started!', true); return; }
-        if(t.registeredTeams?.some(team => team.captainId === user.uid)) {
-            showToast('You already registered a team!', true); return;
-        }
-        if(t.registeredTeams?.length >= t.slots) {
-            showToast('Tournament full!', true); return;
-        }
+        if(t.registeredTeams?.some(team => team.captainId === user.uid)) { showToast('You already registered a team!', true); return; }
+        if(t.registeredTeams?.length >= t.slots) { showToast('Tournament full!', true); return; }
         showTeamForm(id, t);
     };
 
@@ -2498,16 +2402,10 @@
     window.submitTeamReg = async function(id) {
         const user = auth.currentUser;
         if(!user) { showToast('Not logged in!', true); return; }
-        
         const captainDisc = document.getElementById('captainDisc')?.value.trim();
         const captainSo2 = document.getElementById('captainSo2')?.value.trim();
         const teamName = document.getElementById('teamName')?.value.trim();
-        
-        if(!captainDisc || !captainSo2 || !teamName) {
-            showToast('Fill captain and team name!', true); 
-            return;
-        }
-        
+        if(!captainDisc || !captainSo2 || !teamName) { showToast('Fill captain and team name!', true); return; }
         const players = [];
         for(let i=1;i<=4;i++) {
             const disc = document.getElementById(`pDisc_${i}`)?.value.trim();
@@ -2517,26 +2415,15 @@
                 players.push({ discord: disc, so2Id: so2, userId: null });
             }
         }
-        
         const tournamentRef = db.collection('tournaments').doc(id);
         const tournamentDoc = await tournamentRef.get();
         const t = tournamentDoc.data();
-        
         if(!t) return;
         if(t.registeredTeams.length >= t.slots) { showToast('Tournament full!', true); return; }
-        
         const allSo2Ids = [captainSo2, ...players.map(p => p.so2Id)];
         const allDiscords = [captainDisc.toLowerCase(), ...players.map(p => p.discord.toLowerCase())];
-        
-        if(new Set(allSo2Ids).size !== allSo2Ids.length) { 
-            showToast('Duplicate Standoff 2 IDs within your team!', true); 
-            return; 
-        }
-        if(new Set(allDiscords).size !== allDiscords.length) { 
-            showToast('Duplicate Discord usernames within your team!', true); 
-            return; 
-        }
-        
+        if(new Set(allSo2Ids).size !== allSo2Ids.length) { showToast('Duplicate Standoff 2 IDs within your team!', true); return; }
+        if(new Set(allDiscords).size !== allDiscords.length) { showToast('Duplicate Discord usernames within your team!', true); return; }
         let isDuplicate = false;
         for(const team of t.registeredTeams) {
             if(team.captainSo2Id === captainSo2) isDuplicate = true;
@@ -2550,17 +2437,8 @@
                 }
             }
         }
-        
-        if(isDuplicate) { 
-            showToast('Standoff 2 ID or Discord user already registered in this tournament!', true); 
-            return; 
-        }
-        
-        const newTeam = {
-            captainId: user.uid, captainEmail: user.email, captainDiscord: captainDisc,
-            captainSo2Id: captainSo2, teamName, players, registeredAt: new Date().toISOString()
-        };
-        
+        if(isDuplicate) { showToast('Standoff 2 ID or Discord user already registered!', true); return; }
+        const newTeam = { captainId: user.uid, captainEmail: user.email, captainDiscord: captainDisc, captainSo2Id: captainSo2, teamName, players, registeredAt: new Date().toISOString() };
         t.registeredTeams.push(newTeam);
         await tournamentRef.update({ registeredTeams: t.registeredTeams });
         await loadTournaments();
@@ -2568,17 +2446,69 @@
         addNotification(`Team Registered!`, `${teamName} has joined ${t.name}!`, 'info');
         document.getElementById('teamRegistrationModal')?.remove();
     };
+    
+    // Score modal functions
+    function addScoreModal() {
+        if (document.getElementById('scoreModal')) return;
+        const modal = document.createElement('div');
+        modal.id = 'scoreModal';
+        modal.className = 'modal';
+        modal.style.display = 'none';
+        modal.innerHTML = `<div class="score-modal-content"><span class="modal-close" onclick="closeScoreModal()">&times;</span><h2>Submit Match Score</h2><div class="score-input-group"><label>Team 1 Score</label><input type="number" id="team1Score" min="0" max="16" value="0"></div><div class="score-input-group"><label>Team 2 Score</label><input type="number" id="team2Score" min="0" max="16" value="0"></div><button onclick="submitScore()" style="width:100%;padding:12px;background:var(--neon-yellow);border:none;border-radius:8px;font-weight:700;cursor:pointer;">Submit Score</button></div>`;
+        document.body.appendChild(modal);
+    }
 
+    window.openScoreModal = function(tournamentId, matchId) {
+        currentMatchContext = { tournamentId, matchId };
+        const modal = document.getElementById('scoreModal');
+        if (modal) modal.style.display = 'flex';
+    };
+
+    function closeScoreModal() {
+        const modal = document.getElementById('scoreModal');
+        if (modal) modal.style.display = 'none';
+        currentMatchContext = null;
+    }
+
+    window.submitScore = async function() {
+        if (!currentMatchContext) return;
+        const score1 = parseInt(document.getElementById('team1Score')?.value) || 0;
+        const score2 = parseInt(document.getElementById('team2Score')?.value) || 0;
+        if (score1 === score2) { showToast('Scores cannot be equal!', true); return; }
+        const tournament = tournaments.find(t => t.id === currentMatchContext.tournamentId);
+        if (!tournament) return;
+        const match = tournament.bracket?.matches.find(m => m.id === currentMatchContext.matchId);
+        if (!match) return;
+        const winner = score1 > score2 ? match.team1 : match.team2;
+        const bracketManager = new BracketManager(currentMatchContext.tournamentId, tournament);
+        await bracketManager.updateMatchResult(currentMatchContext.matchId, score1, score2, winner);
+        await loadTournaments();
+        closeScoreModal();
+        showToast('Score submitted successfully!');
+        addNotification('Match Result Updated', `${winner.teamName} won their match!`, 'match');
+    };
+
+    window.forceWin = async function(tournamentId, matchId) {
+        if (!confirm('Force win for first team?')) return;
+        const tournament = tournaments.find(t => t.id === tournamentId);
+        if (!tournament) return;
+        const match = tournament.bracket?.matches.find(m => m.id === matchId);
+        if (!match) return;
+        const winner = match.team1;
+        const bracketManager = new BracketManager(tournamentId, tournament);
+        await bracketManager.updateMatchResult(matchId, 2, 0, winner);
+        await loadTournaments();
+        showToast('Force win applied!');
+        addNotification('Force Win Applied', `Admin forced win for ${winner.teamName}`, 'urgent');
+    };
+    
     function renderTournaments() {
         const grid = document.getElementById('tournamentsGrid');
         if(!grid) return;
         const adminActive = document.getElementById('adminPanel')?.classList.contains('active');
         const user = auth.currentUser;
         
-        if(!tournaments.length) {
-            grid.innerHTML = '<div class="empty-state">No tournaments scheduled.</div>';
-            return;
-        }
+        if(!tournaments.length) { grid.innerHTML = '<div class="empty-state">No tournaments scheduled.</div>'; return; }
         
         grid.innerHTML = tournaments.map(t => {
             const regCount = t.registeredTeams?.length || 0;
@@ -2587,34 +2517,20 @@
             const userCaptain = user && t.registeredTeams?.some(team => team.captainId === user.uid);
             const checkInAvailable = userCaptain && canCheckIn(t);
             const isCheckedIn = user && t.checkedInTeams?.includes(user.uid);
-            const bracketAvailable = canViewBracket(t) || t.status === 'live' || t.status === 'completed';
-            const canSeed = currentUserIsAdmin && adminActive && t.registeredTeams?.length >= 2 && !t.bracket && t.status !== 'live' && t.status !== 'completed';
-            const canStart = currentUserIsAdmin && adminActive && t.bracket && t.status !== 'live' && t.status !== 'completed';
+            const bracketAvailable = t.status === 'live' || t.status === 'completed' || t.bracket;
+            const hasGroupStage = t.groupStage ? true : false;
             
-            let statusText = '';
-            let statusClass = '';
-            if(t.status === 'live') {
-                statusText = '🔴 LIVE';
-                statusClass = 'live';
-            } else if(t.status === 'completed') {
-                statusText = '🏆 COMPLETED';
-                statusClass = 'completed';
-            } else if(isFull) {
-                statusText = '🔴 FULL';
-                statusClass = 'full';
-            } else {
-                statusText = '🟢 OPEN';
-                statusClass = 'open';
-            }
-            
-            const displayDate = formatDateForDisplay(t.date);
-            const displayTime = formatTimeForDisplay(t.time);
+            let statusText = '', statusClass = '';
+            if(t.status === 'live') { statusText = '🔴 LIVE'; statusClass = 'live'; }
+            else if(t.status === 'completed') { statusText = '🏆 COMPLETED'; statusClass = 'completed'; }
+            else if(isFull) { statusText = '🔴 FULL'; statusClass = 'full'; }
+            else { statusText = '🟢 OPEN'; statusClass = 'open'; }
             
             return `
                 <div class="tournament-card">
                     <div class="tournament-header">
                         <div class="tournament-name">${escapeHtml(t.name)}</div>
-                        <div class="tournament-date">${displayDate} • ${displayTime}</div>
+                        <div class="tournament-date">${t.date} • ${t.time}</div>
                     </div>
                     <div class="tournament-body">
                         <div class="tournament-info">
@@ -2629,12 +2545,7 @@
                                 <button class="edit-btn" onclick="editTournament('${t.id}')">✏️ EDIT</button>
                                 <button class="delete-btn" onclick="deleteTournament('${t.id}')">🗑️ DELETE</button>
                                 <button class="view-teams-btn" onclick="viewRegisteredTeams('${t.id}')">📋 TEAMS</button>
-                            ` : ''}
-                            ${currentUserIsAdmin && adminActive && canSeed ? `
-                                <button class="seed-btn" onclick="seedTournament('${t.id}')">🎲 SEED TOURNAMENT</button>
-                            ` : ''}
-                            ${currentUserIsAdmin && adminActive && canStart ? `
-                                <button class="start-tournament-btn" onclick="startTournament('${t.id}')">🎮 START TOURNAMENT</button>
+                                <button class="groups-config-btn" onclick="openGroupConfig('${t.id}')">⚙️ GROUPS (${t.groupStage?'Edit':'Create'})</button>
                             ` : ''}
                             ${!adminActive && user && !isFull && !userCaptain && t.status === 'upcoming' ? `
                                 <button class="register-team-btn" onclick="openTeamRegistrationModal('${t.id}')">➕ REGISTER TEAM</button>
@@ -2643,7 +2554,9 @@
                                 <button class="checkin-btn" onclick="checkInTeam('${t.id}')">✅ CHECK-IN</button>
                             ` : ''}
                             ${!adminActive && userCaptain && isCheckedIn ? `<span style="font-size:0.7rem;color:var(--accent-green);">✅ CHECKED IN</span>` : ''}
+                            ${hasGroupStage ? `<button class="view-bracket-btn" onclick="toggleGroupStage('${t.id}')">🏆 VIEW GROUPS</button>` : ''}
                             ${bracketAvailable ? `<button class="view-bracket-btn" onclick="toggleBracket('${t.id}')">🏆 VIEW BRACKET</button>` : ''}
+                            <div id="groupStage-${t.id}" class="bracket-preview" style="display:none;">${t.groupStage ? renderGroupStage(t) : ''}</div>
                             <div id="bracket-${t.id}" class="bracket-preview" style="display:none;"></div>
                         </div>
                     </div>
@@ -2651,13 +2564,41 @@
             `;
         }).join('');
     }
-
-    // ==================== AUTHENTICATION FUNCTIONS ====================
-    window.openModal = (id) => document.getElementById(id)?.classList.add('active');
-    window.closeModal = (id) => {
-        const modal = document.getElementById(id);
-        if(modal) modal.classList.remove('active');
+    
+    window.openGroupConfig = async function(tournamentId) {
+        if(!currentUserIsAdmin) { showToast("Admin only", true); return; }
+        const select = document.getElementById('tournamentGroupSelect');
+        if(select) select.value = tournamentId;
+        const preview = document.getElementById('groupPreview');
+        const t = tournaments.find(t => t.id === tournamentId);
+        if(preview && t) preview.innerHTML = `<div>✅ Selected: ${escapeHtml(t.name)} (${t.registeredTeams?.length || 0} teams registered)</div>`;
+        
+        // Scroll to admin panel
+        document.getElementById('adminPanel')?.classList.add('active');
+        document.getElementById('adminPanel')?.scrollIntoView({ behavior: 'smooth' });
     };
+    
+    // DISCORD LOGIN
+    const discordProvider = new firebase.auth.OAuthProvider('oidc.discord-login');
+    discordProvider.addScope('identify');
+    window.signInWithDiscord = async function() {
+        try {
+            const result = await auth.signInWithPopup(discordProvider);
+            const user = result.user;
+            let discordUsername = user.displayName || user.email?.split('@')[0] || 'Discord User';
+            await db.collection('users').doc(user.uid).set({ uid: user.uid, email: user.email, discordUsername: discordUsername, isAdmin: false }, { merge: true });
+            showToast(`Welcome ${discordUsername}!`);
+            addNotification('Discord Login', `Logged in as ${discordUsername}`, 'info');
+            closeModal('loginModal'); closeModal('registerModal');
+            await loadTournaments();
+        } catch (error) {
+            showToast('Discord login failed', true);
+        }
+    };
+
+    // ==================== AUTH & EVENT LISTENERS ====================
+    window.openModal = (id) => document.getElementById(id)?.classList.add('active');
+    window.closeModal = (id) => { const modal = document.getElementById(id); if(modal) modal.classList.remove('active'); };
     window.switchToRegister = () => { closeModal('loginModal'); openModal('registerModal'); };
     window.switchToLogin = () => { closeModal('registerModal'); openModal('loginModal'); };
     
@@ -2666,11 +2607,7 @@
         const pwd = document.getElementById('loginPassword').value;
         const errDiv = document.getElementById('loginError');
         if(!email || !pwd) { errDiv.innerText = 'Fill all fields'; return; }
-        auth.signInWithEmailAndPassword(email, pwd).then(() => {
-            closeModal('loginModal');
-            showToast('Logged in!');
-            addNotification('Welcome Back!', `Logged in as ${email}`, 'info');
-        }).catch(e => { errDiv.innerText = e.code === 'auth/user-not-found' ? 'User not found' : 'Wrong credentials'; });
+        auth.signInWithEmailAndPassword(email, pwd).then(() => { closeModal('loginModal'); showToast('Logged in!'); addNotification('Welcome Back!', `Logged in as ${email}`, 'info'); }).catch(e => { errDiv.innerText = e.code === 'auth/user-not-found' ? 'User not found' : 'Wrong credentials'; });
     };
     
     window.register = () => {
@@ -2680,19 +2617,10 @@
         const errDiv = document.getElementById('registerError');
         if(!username || !email || !pwd) { errDiv.innerText = 'Fill all fields'; return; }
         if(pwd.length < 6) { errDiv.innerText = 'Password min 6 chars'; return; }
-        auth.createUserWithEmailAndPassword(email, pwd).then(cred => {
-            db.collection('users').doc(cred.user.uid).set({ username, email, isAdmin: false, createdAt: new Date() });
-            showToast('Registered!');
-            closeModal('registerModal');
-            addNotification('Account Created!', `Welcome to HEJTERI, ${username}!`, 'info');
-        }).catch(e => { errDiv.innerText = e.code === 'auth/email-already-in-use' ? 'Email exists' : 'Error'; });
+        auth.createUserWithEmailAndPassword(email, pwd).then(cred => { db.collection('users').doc(cred.user.uid).set({ username, email, isAdmin: false, createdAt: new Date() }); showToast('Registered!'); closeModal('registerModal'); addNotification('Account Created!', `Welcome to HEJTERI, ${username}!`, 'info'); }).catch(e => { errDiv.innerText = e.code === 'auth/email-already-in-use' ? 'Email exists' : 'Error'; });
     };
     
-    window.logout = () => { 
-        auth.signOut(); 
-        showToast('Logged out');
-        addNotification('Logged Out', 'You have been logged out.', 'info');
-    };
+    window.logout = () => { auth.signOut(); showToast('Logged out'); addNotification('Logged Out', 'You have been logged out.', 'info'); };
     
     auth.onAuthStateChanged(async (user) => {
         const unauth = document.getElementById('unauthButtons');
@@ -2705,26 +2633,10 @@
             if(unauth) unauth.style.display = 'none';
             if(authDiv) authDiv.style.display = 'flex';
             if(userSpan) userSpan.innerText = user.email;
-            
             const userDoc = await db.collection('users').doc(user.uid).get();
-            if(userDoc.exists) {
-                const userData = userDoc.data();
-                if(userData.discordUsername && userData.discordUsername !== 'Discord User') {
-                    if(userSpan) userSpan.innerText = userData.discordUsername;
-                } else if(userData.username) {
-                    if(userSpan) userSpan.innerText = userData.username;
-                } else {
-                    if(userSpan) userSpan.innerText = user.email;
-                }
-                currentUserIsAdmin = userData.isAdmin === true;
-            } else {
-                currentUserIsAdmin = false;
-            }
-            
-            if(adminBtn) {
-                if(currentUserIsAdmin) adminBtn.style.display = 'block';
-                else { adminBtn.style.display = 'none'; if(adminPanel) adminPanel.classList.remove('active'); }
-            }
+            if(userDoc.exists) { currentUserIsAdmin = userDoc.data().isAdmin === true; }
+            else { currentUserIsAdmin = false; }
+            if(adminBtn) { if(currentUserIsAdmin) adminBtn.style.display = 'block'; else { adminBtn.style.display = 'none'; if(adminPanel) adminPanel.classList.remove('active'); } }
         } else {
             currentUserIsAdmin = false;
             if(unauth) unauth.style.display = 'flex';
@@ -2734,7 +2646,6 @@
         renderTournaments();
     });
     
-    // ==================== EVENT LISTENERS ====================
     document.addEventListener('DOMContentLoaded', () => {
         addScoreModal();
         loadNotifications();
@@ -2742,87 +2653,37 @@
         const bell = document.getElementById('notificationBell');
         const panel = document.getElementById('notificationPanel');
         if(bell && panel) {
-            bell.addEventListener('click', (e) => {
-                e.stopPropagation();
-                panel.classList.toggle('active');
-            });
-            document.addEventListener('click', (e) => {
-                if(!panel.contains(e.target) && !bell.contains(e.target)) {
-                    panel.classList.remove('active');
-                }
-            });
+            bell.addEventListener('click', (e) => { e.stopPropagation(); panel.classList.toggle('active'); });
+            document.addEventListener('click', (e) => { if(!panel.contains(e.target) && !bell.contains(e.target)) panel.classList.remove('active'); });
         }
-        
-        document.getElementById('clearNotificationsBtn')?.addEventListener('click', () => {
-            notifications = [];
-            saveNotifications();
-            showToast('All notifications cleared');
-        });
-        
+        document.getElementById('clearNotificationsBtn')?.addEventListener('click', () => { notifications = []; saveNotifications(); showToast('All notifications cleared'); });
         document.getElementById('requestPermissionBtn')?.addEventListener('click', requestBrowserNotification);
-        
         document.getElementById('discordLoginBtn')?.addEventListener('click', signInWithDiscord);
         document.getElementById('showLoginBtn')?.addEventListener('click', () => openModal('loginModal'));
         document.getElementById('showRegisterBtn')?.addEventListener('click', () => openModal('registerModal'));
         document.getElementById('logoutBtn')?.addEventListener('click', () => auth.signOut());
-        document.getElementById('adminToggleBtn')?.addEventListener('click', () => {
-            if(currentUserIsAdmin) {
-                document.getElementById('adminPanel')?.classList.toggle('active');
-                renderTournaments();
-            } else {
-                showToast('Admin access required!', true);
-            }
-        });
-        document.getElementById('tournamentForm')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const name = document.getElementById('tournamentName').value;
-            const date = document.getElementById('tournamentDate').value;
-            const time = document.getElementById('tournamentTime').value;
-            const prize = document.getElementById('tournamentPrize').value;
-            const details = document.getElementById('tournamentDetails').value;
-            const slots = document.getElementById('tournamentSlots').value;
-            if(name && date && time && prize) {
-                await addTournament(name, date, time, prize, details, slots);
-                e.target.reset();
-            } else showToast('Fill required fields', true);
-        });
+        document.getElementById('adminToggleBtn')?.addEventListener('click', () => { if(currentUserIsAdmin) document.getElementById('adminPanel')?.classList.toggle('active'); else showToast('Admin access required!', true); });
+        document.getElementById('tournamentForm')?.addEventListener('submit', async (e) => { e.preventDefault(); await addTournament(document.getElementById('tournamentName').value, document.getElementById('tournamentDate').value, document.getElementById('tournamentTime').value, document.getElementById('tournamentPrize').value, document.getElementById('tournamentDetails').value, document.getElementById('tournamentSlots').value); e.target.reset(); });
         document.getElementById('contactBtn')?.addEventListener('click', () => showToast('Click Register Team on any tournament'));
-        
-        // Discord link - https://discord.gg/epVVPdpgm
         document.getElementById('discordBtn')?.addEventListener('click', () => window.open('https://discord.gg/epVVPdpgm', '_blank'));
-        
-        // Email kontakt - hejterigg@gmail.com
-        document.getElementById('emailBtn')?.addEventListener('click', () => { 
-            window.location.href = 'mailto:hejterigg@gmail.com';
-            showToast('Email client opened!'); 
-        });
-        
+        document.getElementById('emailBtn')?.addEventListener('click', () => { window.location.href = 'mailto:hejterigg@gmail.com'; showToast('Email client opened!'); });
         document.getElementById('hamburgerBtn')?.addEventListener('click', () => document.getElementById('navLinks')?.classList.toggle('active'));
         
-        document.addEventListener('click', function(e) {
-            const navLinks = document.getElementById('navLinks');
-            const hamburger = document.getElementById('hamburgerBtn');
-            if(navLinks?.classList.contains('active') && 
-               !navLinks.contains(e.target) && 
-               !hamburger?.contains(e.target)) {
-                navLinks.classList.remove('active');
-            }
+        document.getElementById('applyGroupsToTournamentBtn')?.addEventListener('click', async () => {
+            if(!currentUserIsAdmin) { showToast("Admin only", true); return; }
+            const tournamentId = document.getElementById('tournamentGroupSelect').value;
+            if(!tournamentId) { showToast("Select a tournament", true); return; }
+            const teamsPerGroup = parseInt(document.getElementById('teamsPerGroup').value);
+            const qualifiersPerGroup = parseInt(document.getElementById('qualifiersPerGroup').value);
+            if(teamsPerGroup < 2 || qualifiersPerGroup < 1) { showToast("Invalid numbers", true); return; }
+            await generateGroupStage(tournamentId, teamsPerGroup, qualifiersPerGroup);
         });
         
-        document.querySelectorAll('.nav-links a').forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const target = document.querySelector(link.getAttribute('href'));
-                if(target) target.scrollIntoView({ behavior: 'smooth' });
-                document.getElementById('navLinks')?.classList.remove('active');
-            });
-        });
+        document.addEventListener('click', function(e) { const navLinks = document.getElementById('navLinks'); const hamburger = document.getElementById('hamburgerBtn'); if(navLinks?.classList.contains('active') && !navLinks.contains(e.target) && !hamburger?.contains(e.target)) { navLinks.classList.remove('active'); } });
+        document.querySelectorAll('.nav-links a').forEach(link => { link.addEventListener('click', (e) => { e.preventDefault(); const target = document.querySelector(link.getAttribute('href')); if(target) target.scrollIntoView({ behavior: 'smooth' }); document.getElementById('navLinks')?.classList.remove('active'); }); });
         
         loadTournaments();
-        
-        if('Notification' in window && Notification.permission === 'granted') {
-            browserNotificationPermission = true;
-        }
+        if('Notification' in window && Notification.permission === 'granted') browserNotificationPermission = true;
     });
 </script>
 </body>
